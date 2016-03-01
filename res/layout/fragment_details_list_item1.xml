@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/details_list_item_height"
+    android:baselineAligned="false"
+    android:gravity="center_vertical" >
+
+    <include
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        layout="@layout/widget_details_common_info" />
+
+    <LinearLayout
+        android:id="@+id/widget_frame"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="horizontal" >
+
+        <RadioGroup
+            android:id="@+id/state"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="horizontal"
+            tools:ignore="NestedWeights" >
+
+            <RadioButton
+                android:id="@+id/yes"
+                android:layout_marginEnd="50dp"
+                android:text="@android:string/yes" />
+
+            <RadioButton
+                android:id="@+id/no"
+                android:checked="true"
+                android:text="@android:string/no" />
+        </RadioGroup>
+
+        <include layout="@layout/widget_arrow_right" />
+    </LinearLayout>
+
+</LinearLayout>

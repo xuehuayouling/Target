@@ -1,4 +1,4 @@
-package com.ruili.target.activity;
+package com.ruili.target.activitys;
 
 import com.ruili.target.R;
 

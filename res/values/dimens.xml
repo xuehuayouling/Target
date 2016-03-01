@@ -13,4 +13,10 @@
 	<dimen name="main_button_text_distance">14.72dp</dimen>
 	<dimen name="main_settings_button_width">37.5dp</dimen>
 	<dimen name="main_settings_button_height">37.5dp</dimen>
+	<dimen name="preference_item_padding_side">8dp</dimen>
+	<dimen name="preference_icon_minWidth">0dp</dimen>
+	<dimen name="preference_item_padding_inner">8dp</dimen>
+	<dimen name="main_list_item_height">70.4dp</dimen>
+	<dimen name="details_list_item_height">88.3dp</dimen>
+	<dimen name="details_list_item_indicator_width">19.8dp</dimen>
 </resources>

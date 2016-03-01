@@ -9,4 +9,5 @@
     <string name="history_targets">历史指标</string>
 	<string name="inspect_supervise">视察监督</string>
 	<string name="others">其他</string>
+	<string name="back">返回</string>
 </resources>

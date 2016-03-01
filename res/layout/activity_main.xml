@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/bg_main"
-    tools:context="com.ruili.target.activity.MainActivity" >
+    tools:context="com.ruili.target.activitys.MainActivity" >
 
     <ImageButton
         android:layout_width="@dimen/main_settings_button_width"
@@ -30,6 +30,7 @@
             android:orientation="vertical" >
 
             <ImageButton
+                android:id="@+id/imgbtn_today_targets"
                 android:layout_width="@dimen/main_buttons_width"
                 android:layout_height="@dimen/main_buttons_height"
                 android:background="@drawable/ic_today_targets"
