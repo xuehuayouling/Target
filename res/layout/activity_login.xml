@@ -1,0 +1,38 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_login"
+    tools:context="com.ruili.target.LoginActivity" >
+
+    <LinearLayout 
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:orientation="vertical"
+        android:layout_marginBottom="@dimen/login_button_margin_bottom">
+        <EditText
+            android:background="@drawable/selector_et"
+            android:layout_width="@dimen/login_widget_width"
+            android:layout_height="@dimen/login_widget_height"
+            android:singleLine="true"
+            android:gravity="center"
+            android:layout_marginBottom="12.8dp"
+            android:inputType="text"/>
+        <EditText
+            android:background="@drawable/selector_et"
+            android:layout_width="@dimen/login_widget_width"
+            android:layout_height="@dimen/login_widget_height"
+            android:layout_marginBottom="25.6dp"
+            android:singleLine="true"
+            android:gravity="center"
+            android:inputType="textPassword"/>
+        <Button 
+            android:background="@drawable/selector_btn"
+            android:layout_width="@dimen/login_widget_width"
+            android:layout_height="@dimen/login_widget_height"
+            android:text="@string/action_login"/>
+    </LinearLayout>
+
+</RelativeLayout>
