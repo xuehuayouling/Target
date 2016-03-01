@@ -15,7 +15,6 @@ public class TargetListActivity extends Activity {
 		ActionBar actionBar = getActionBar();
 		actionBar.setDisplayHomeAsUpEnabled(true);
 		actionBar.setDisplayShowHomeEnabled(false);
-		actionBar.setTitle(R.string.back);
 		setContentView(R.layout.activity_target_list);
 	}
 
