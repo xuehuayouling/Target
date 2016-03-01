@@ -6,4 +6,11 @@
 	<dimen name="login_widget_width">384dp</dimen>
 	<dimen name="login_widget_height">38.4dp</dimen>
 	<dimen name="login_button_margin_bottom">176.64dp</dimen>
+	<dimen name="main_buttons_margin_bottom">54.66dp</dimen>
+	<dimen name="main_buttons_width">102.4dp</dimen>
+	<dimen name="main_buttons_height">102.4dp</dimen>
+	<dimen name="main_buttons_distance">140.7dp</dimen>
+	<dimen name="main_button_text_distance">14.72dp</dimen>
+	<dimen name="main_settings_button_width">37.5dp</dimen>
+	<dimen name="main_settings_button_height">37.5dp</dimen>
 </resources>

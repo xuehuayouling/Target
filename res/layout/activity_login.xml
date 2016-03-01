@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/bg_login"
-    tools:context="com.ruili.target.LoginActivity" >
+    tools:context="com.ruili.target.activity.LoginActivity" >
 
     <LinearLayout 
         android:layout_width="wrap_content"
@@ -29,6 +29,7 @@
             android:gravity="center"
             android:inputType="textPassword"/>
         <Button 
+            android:id="@+id/btn_login"
             android:background="@drawable/selector_btn"
             android:layout_width="@dimen/login_widget_width"
             android:layout_height="@dimen/login_widget_height"
