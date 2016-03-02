@@ -6,7 +6,6 @@ import java.util.Random;
 
 import com.ruili.target.R;
 import com.ruili.target.adapters.DetailsFragmentAdapter;
-import com.ruili.target.adapters.MainFragmentAdapter;
 import com.ruili.target.entity.Entity1;
 import com.ruili.target.entity.Entity2;
 import com.ruili.target.entity.Entity3;

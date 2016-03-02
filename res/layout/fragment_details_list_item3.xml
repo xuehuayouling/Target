@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="@dimen/details_list_item_height"
     android:baselineAligned="false"
+    android:descendantFocusability="blocksDescendants"
     android:gravity="center_vertical" >
 
     <include

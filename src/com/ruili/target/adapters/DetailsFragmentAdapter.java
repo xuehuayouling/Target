@@ -3,7 +3,6 @@ package com.ruili.target.adapters;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.ruili.target.R;
 import com.ruili.target.entity.Entity1;
 
 import android.content.Context;
