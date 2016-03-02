@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Random;
 
 import com.ruili.target.R;
+import com.ruili.target.activitys.TargetDetailsActivity;
 import com.ruili.target.adapters.DetailsFragmentAdapter;
 import com.ruili.target.entity.Entity1;
 import com.ruili.target.entity.Entity2;
@@ -12,6 +13,7 @@ import com.ruili.target.entity.Entity3;
 import com.ruili.target.entity.Entity4;
 
 import android.app.ListFragment;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,6 +40,7 @@ public class DetailFragment extends ListFragment {
 
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
+		startActivity(new Intent(getActivity(), TargetDetailsActivity.class));
 		super.onListItemClick(l, v, position, id);
 	}
 

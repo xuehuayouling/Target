@@ -20,4 +20,6 @@
 	<dimen name="details_list_item_height">88.3dp</dimen>
 	<dimen name="details_list_item_indicator_width">19.8dp</dimen>
 	<dimen name="action_bar_icon_vertical_padding">8dp</dimen>
+	<dimen name="details_proof_photo_width">140.8dp</dimen>
+	<dimen name="details_proof_photo_height">140.8dp</dimen>
 </resources>

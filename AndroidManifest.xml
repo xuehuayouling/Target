@@ -7,6 +7,7 @@
     <uses-sdk
         android:minSdkVersion="17"
         android:targetSdkVersion="23" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -31,6 +32,10 @@
         </activity>
         <activity
             android:name="com.ruili.target.activitys.TargetListActivity"
+            android:screenOrientation="landscape" >
+        </activity>
+        <activity
+            android:name="com.ruili.target.activitys.TargetDetailsActivity"
             android:screenOrientation="landscape" >
         </activity>
     </application>
