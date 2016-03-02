@@ -34,12 +34,12 @@ public class TargetDetailsActivity extends Activity implements OnClickListener {
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.imgv_take_photo:
-			Intent intent = new Intent();  
-            intent.setAction(MediaStore.ACTION_IMAGE_CAPTURE);
-            ContentValues values = new ContentValues(); 
-            photoUri = this.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values); 
-            intent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
-            startActivityForResult(intent, 300); 
+			Intent intent = new Intent();
+			intent.setAction(MediaStore.ACTION_IMAGE_CAPTURE);
+			ContentValues values = new ContentValues();
+			photoUri = this.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+			intent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
+			startActivityForResult(intent, 300);
 			break;
 
 		default:
@@ -49,22 +49,22 @@ public class TargetDetailsActivity extends Activity implements OnClickListener {
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if(requestCode == 300){  
-            if(resultCode == RESULT_OK){  
-            	String[] pojo = { MediaStore.Images.Media.DATA };
-        		Cursor cursor = managedQuery(photoUri, pojo, null, null, null);
-        		if (cursor != null) {
-        			int columnIndex = cursor.getColumnIndexOrThrow(pojo[0]);
-        			cursor.moveToFirst();
-        			String picPath = cursor.getString(columnIndex);
-        			cursor.close();
-        			Bitmap bmap = BitmapFactory.decodeFile(picPath);;  
-        			ImageView imageview = (ImageView)this.findViewById(R.id.imgv_photo_preview);  
-        			imageview.setImageBitmap(bmap);  
-        		}
-            }  
-        }  
+		if (requestCode == 300) {
+			if (resultCode == RESULT_OK) {
+				String[] pojo = { MediaStore.Images.Media.DATA };
+				Cursor cursor = getContentResolver().query(photoUri, pojo, null, null, null);
+				if (cursor != null) {
+					int columnIndex = cursor.getColumnIndexOrThrow(pojo[0]);
+					if (cursor.moveToFirst()) {
+						String picPath = cursor.getString(columnIndex);
+						Bitmap bmap = BitmapFactory.decodeFile(picPath);
+						ImageView imageview = (ImageView) this.findViewById(R.id.imgv_photo_preview);
+						imageview.setImageBitmap(bmap);
+					}
+					cursor.close();
+				}
+			}
+		}
 	}
-	
-	
+
 }
