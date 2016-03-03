@@ -28,22 +28,18 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 
-public class LoginActivity extends Activity implements OnClickListener {
+public class LoginActivity extends BaseActivity implements OnClickListener {
 
 	private EditText mETUserName;
 	private EditText mETPassword;
-	private ImmediatelyShowToast mToast;
 	private RequestQueue mQueue;
-	private ProgressDialogUtils mProgressDialogUtils;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_login);
 		initViews();
-		initToast();
 		initRequestQueue();
-		initProgressDialog();
 	}
 
 	private void initViews() {
@@ -53,13 +49,6 @@ public class LoginActivity extends Activity implements OnClickListener {
 		btnLogin.setOnClickListener(this);
 	}
 
-	private void initToast() {
-		mToast = ImmediatelyShowToast.getInstance(getApplication());
-	}
-
-	private void initProgressDialog() {
-		mProgressDialogUtils = ProgressDialogUtils.getInstance(this);
-	}
 
 	private void initRequestQueue() {
 		mQueue = Volley.newRequestQueue(this);

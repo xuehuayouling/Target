@@ -40,6 +40,10 @@
             android:name="com.ruili.target.activitys.TargetDetailsActivity"
             android:screenOrientation="landscape" >
         </activity>
+        <activity
+            android:name="com.ruili.target.activitys.BaseActivity"
+            android:screenOrientation="landscape" >
+        </activity>
     </application>
 
 </manifest>

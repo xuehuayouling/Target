@@ -5,6 +5,7 @@ import com.ruili.target.R;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -43,9 +44,9 @@ public class Entity1 {
 		if (null == convertView) {
 			view = inflater.inflate(getResouceID(), parent, false);
 			ViewHolder holder = new ViewHolder();
-			holder.ivNo = (ImageView) view.findViewById(R.id.icon);
-			holder.tvTitle = (TextView) view.findViewById(R.id.title);
-			holder.tvSummary = (TextView) view.findViewById(R.id.summary);
+			holder.ivNo = (Button) view.findViewById(R.id.btn_id);
+			holder.tvTitle = (TextView) view.findViewById(R.id.tv_title);
+			holder.tvSummary = (TextView) view.findViewById(R.id.tv_summary);
 			view.setTag(holder);
 		} else {
 			view = convertView;
@@ -60,7 +61,7 @@ public class Entity1 {
 	}
 
 	class ViewHolder {
-		ImageView ivNo;
+		Button ivNo;
 		TextView tvTitle;
 		TextView tvSummary;
 	}

@@ -15,7 +15,7 @@ import android.view.ViewGroup.LayoutParams;
 import android.widget.ImageButton;
 import android.widget.PopupWindow;
 
-public class MainActivity extends Activity implements OnClickListener {
+public class MainActivity extends BaseActivity implements OnClickListener {
 
 	private PopupWindow mPopupWindow;
 
@@ -33,6 +33,7 @@ public class MainActivity extends Activity implements OnClickListener {
 		startActivity(new Intent(getApplicationContext(), LoginActivity.class));
 		finish();
 	}
+
 	private void initViews() {
 		ImageButton imgBtnTodayTargets = (ImageButton) findViewById(R.id.imgbtn_today_targets);
 		ImageButton imgBtnHistoryTargets = (ImageButton) findViewById(R.id.imgbtn_history_targets);
@@ -56,20 +57,13 @@ public class MainActivity extends Activity implements OnClickListener {
 		}
 	}
 
-	private int getUserType() {
-		SharedPreferences sharedPreferences = getSharedPreferences(User.SHAREDPREFERENCES_KEY, Activity.MODE_PRIVATE);
-		return sharedPreferences.getInt(User.SHAREDPREFERENCES_TYEP, -1);
-	}
-
 	@Override
-
 	public boolean onTouchEvent(MotionEvent event) {
 		if (mPopupWindow != null && mPopupWindow.isShowing()) {
 			mPopupWindow.dismiss();
 			mPopupWindow = null;
 		}
 		return super.onTouchEvent(event);
-
 	}
 
 	private void clearUserInfo() {
@@ -78,34 +72,48 @@ public class MainActivity extends Activity implements OnClickListener {
 		editor.clear();
 		editor.commit();
 	}
+
 	@Override
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.imgbtn_today_targets:
-			startActivity(new Intent(this, TargetListActivity.class));
+		case R.id.imgbtn_history_targets:
+		case R.id.imgbtn_inspect_supervise:
+			showTargetListActivity(TargetListActivity.TYPE_TODAY);
 			break;
+
 		case R.id.imgbtn_settings:
-			if (mPopupWindow == null) {
-				View view = LayoutInflater.from(this).inflate(R.layout.widget_quit, null);
-				view.setOnClickListener(new OnClickListener() {
-					
-					@Override
-					public void onClick(View arg0) {
-						clearUserInfo();
-						showLoginActivity();
-					}
-				});
-				mPopupWindow = new PopupWindow(view, LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-				mPopupWindow.showAsDropDown(findViewById(R.id.imgbtn_settings), 10, 10);
-				mPopupWindow.setFocusable(true);  
-				mPopupWindow.update();
-			} else {
-				mPopupWindow.dismiss();
-				mPopupWindow = null;
-			}
+			optionPopupWindow();
 			break;
 		default:
 			break;
+		}
+	}
+
+	private void showTargetListActivity(int type) {
+		Intent intent = new Intent(this, TargetListActivity.class);
+		intent.putExtra(TargetListActivity.TYPE_KEY, type);
+		startActivity(intent);
+	}
+
+	private void optionPopupWindow() {
+		if (mPopupWindow == null) {
+			View view = LayoutInflater.from(this).inflate(R.layout.widget_quit, null);
+			view.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View arg0) {
+					clearUserInfo();
+					showLoginActivity();
+				}
+			});
+			mPopupWindow = new PopupWindow(view, LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+			mPopupWindow.showAsDropDown(findViewById(R.id.imgbtn_settings), 10, 10);
+			mPopupWindow.setFocusable(true);
+			mPopupWindow.update();
+		} else {
+			mPopupWindow.dismiss();
+			mPopupWindow = null;
 		}
 	}
 }

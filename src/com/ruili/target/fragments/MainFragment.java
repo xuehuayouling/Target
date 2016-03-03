@@ -3,31 +3,36 @@ package com.ruili.target.fragments;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.android.volley.Request.Method;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
 import com.ruili.target.R;
+import com.ruili.target.activitys.TargetListActivity;
 import com.ruili.target.adapters.MainFragmentAdapter;
+import com.ruili.target.entity.Category;
 import com.ruili.target.entity.Entity1;
+import com.ruili.target.entity.ResponseDTO;
+import com.ruili.target.entity.User;
+import com.ruili.target.utils.Constant;
+import com.ruili.target.utils.JsonUtil;
 
+import android.app.Activity;
 import android.app.ListFragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 public class MainFragment extends ListFragment {
-	String[] cities = {
-	         "Shenzhen",
-	         "Beijing",
-	         "Shanghai",
-	         "Guangzhou",
-	         "Wuhan",
-	         "Tianjing",
-	         "Changsha",
-	         "Xi'an",
-	         "Chongqing",
-	         "Guilin",
-	    };
+	private TargetListActivity mActivity;
+	private MainFragmentAdapter mAdapter;
+
+	public void setActivity(TargetListActivity activity) {
+		this.mActivity = activity;
+	}
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		return inflater.inflate(R.layout.fragment_main, container, false);
@@ -41,13 +46,47 @@ public class MainFragment extends ListFragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		List<Entity1> list = new ArrayList<>();
-		for (String title : cities) {
-			Entity1 entity = new Entity1();
-			entity.setTitle(title);
-			list.add(entity);
+		mAdapter = new MainFragmentAdapter(getActivity(), null);
+		this.setListAdapter(mAdapter);
+	}
+
+	@Override
+	public void onAttach(Activity activity) {
+		super.onAttach(activity);
+	}
+
+	public void updateData() {
+		mActivity.getProgressDialogUtils().show("");
+		StringRequest stringRequest = new StringRequest(Method.GET, getCategoryUrl(),
+				new Response.Listener<String>() {
+
+					@Override
+					public void onResponse(String response) {
+						mActivity.getProgressDialogUtils().cancel();
+						decodeResponse(response);
+					}
+				}, new Response.ErrorListener() {
+
+					@Override
+					public void onErrorResponse(VolleyError error) {
+						mActivity.getProgressDialogUtils().cancel();
+						mActivity.getToast().show(error.toString());
+					}
+				});
+		mActivity.getRequestQueue().add(stringRequest);
+	}
+	
+	private void decodeResponse(String response) {
+		ResponseDTO dto = JsonUtil.parseObject(response, ResponseDTO.class);
+		if (dto.isValid()) {
+			List<Category> categories = JsonUtil.parseSpecialArray(response, "data",Category.class);
+			mAdapter.setCategories(categories);
+		} else {
+			mActivity.getToast().show(R.string.get_data_fail);
 		}
-		this.setListAdapter(new MainFragmentAdapter(getActivity(), list));
+	}
+	private String getCategoryUrl() {
+		return Constant.BASE_URL + String.format("/api/v1/index/%d/big_indexs", mActivity.getUserOperatorID());
 	}
 
 }

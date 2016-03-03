@@ -2,19 +2,19 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.ruili.target.LoginActivity" >
 
-    <item
-        android:id="@+id/action_show_date"
-        android:orderInCategory="100"
-        android:showAsAction="ifRoom|withText"
-        android:icon="@android:drawable/ic_menu_search"
-        android:title=""/>
-    
     <item  
         android:id="@+id/menu_search"  
         android:actionViewClass="android.widget.SearchView"  
         android:icon="@android:drawable/ic_menu_search"  
         android:showAsAction="ifRoom"  
         android:title="@android:string/search_go"/>
+    
+    <item
+        android:id="@+id/action_scan"
+        android:orderInCategory="100"
+        android:showAsAction="ifRoom|withText"
+        android:icon="@drawable/ic_scan"
+        android:title="@string/scan"/>
     
     <item
         android:id="@+id/action_settings"

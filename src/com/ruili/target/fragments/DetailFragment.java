@@ -21,18 +21,7 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 
 public class DetailFragment extends ListFragment {
-	String[] cities = {
-	         "Shenzhen",
-	         "Beijing",
-	         "Shanghai",
-	         "Guangzhou",
-	         "Wuhan",
-	         "Tianjing",
-	         "Changsha",
-	         "Xi'an",
-	         "Chongqing",
-	         "Guilin",
-	    };
+	String[] cities = {};
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		return inflater.inflate(R.layout.fragment_details, container, false);
