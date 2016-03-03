@@ -10,4 +10,7 @@
 	<string name="inspect_supervise">视察监督</string>
 	<string name="others">其他</string>
 	<string name="back">返回</string>
+	<string name="valid_user_or_password">无效用户名活密码</string>
+	<string name="please_wait">请稍后…</string>
+	<string name="logining">登录中…</string>
 </resources>

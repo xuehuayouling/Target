@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center" >
+
+    <TextView
+        android:id="@+id/tv_date_picker"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:drawableStart="@drawable/ic_arrow_right"
+        android:gravity="center"
+        android:singleLine="true"
+        android:text="@string/action_login"
+        tools:ignore="ContentDescription" />
+    
+    <Spinner
+        android:id="@+id/sp_employee"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:drawableStart="@drawable/ic_arrow_right"
+        android:gravity="center"
+        android:singleLine="true"
+        android:text="@string/action_login"
+        tools:ignore="ContentDescription" />
+
+</LinearLayout>
