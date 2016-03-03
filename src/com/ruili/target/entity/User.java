@@ -6,6 +6,9 @@ public class User {
 	public static final String SHAREDPREFERENCES_NAME = "name";
 	public static final String SHAREDPREFERENCES_TYEP = "type";
 	public static final String SHAREDPREFERENCES_OPERATOR_ID = "operator_id";
+	public static final int TYPE_SUPERVISOR = 0;
+	public static final int TYPE_MANAGER = 1;
+	public static final int TYPE_QC = 2;
 
 	private int operator_id;
 	private String name;

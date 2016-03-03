@@ -18,6 +18,8 @@ public class ProgressDialogUtils {
 	public static synchronized ProgressDialogUtils getInstance(Activity context) {
 		if (mSelf == null) {
 			mSelf = new ProgressDialogUtils(context);
+		} else if (mSelf.mContext != context) {
+			mSelf = new ProgressDialogUtils(context);
 		}
 		return mSelf;
 	}
@@ -34,6 +36,7 @@ public class ProgressDialogUtils {
 	public void cancel() {
 		if (mProgressDialog != null) {
 			mProgressDialog.cancel();
+			mProgressDialog = null;
 		}
 	}
 }

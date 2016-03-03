@@ -13,4 +13,5 @@
 	<string name="valid_user_or_password">无效用户名活密码</string>
 	<string name="please_wait">请稍后…</string>
 	<string name="logining">登录中…</string>
+	<string name="quit_login">退出登录</string>
 </resources>

@@ -41,6 +41,7 @@ public class ImmediatelyShowToast {
 	public void cancel() {
 		if (mToast != null) {
 			mToast.cancel();
+			mToast = null;
 		}
 	}
 }
