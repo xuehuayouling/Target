@@ -4,4 +4,7 @@
     <color name="red">#e60044</color>
     <color name="yellow">#fdcd00</color>
     <color name="green">#a5d4ad</color>
+    <color name="subcategory_state_undo">@color/red</color>
+    <color name="subcategory_state_done">@color/yellow</color>
+    <color name="subcategory_state_confirmed">@color/green</color>
 </resources>

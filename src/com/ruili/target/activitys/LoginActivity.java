@@ -109,13 +109,18 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 	}
 
 	private void decodeResponse(String response) {
-		ResponseDTO dto = JsonUtil.parseObject(response, ResponseDTO.class);
-		if (dto.isValid()) {
-			User user = JsonUtil.parseSpecialObject(response, "data", User.class);
-			saveUserInfo(user);
-			showMainActivity();
-		} else {
-			mToast.show(R.string.valid_user_or_password);
+		try {
+			ResponseDTO dto = JsonUtil.parseObject(response, ResponseDTO.class);
+			if (dto.isValid()) {
+				User user = JsonUtil.parseSpecialObject(response, "data", User.class);
+				saveUserInfo(user);
+				showMainActivity();
+			} else {
+				mToast.show(R.string.valid_user_or_password);
+			}
+		} catch (Exception e) {
+			mToast.show(getText(R.string.service_fail) + response);
+			e.printStackTrace();
 		}
 	}
 

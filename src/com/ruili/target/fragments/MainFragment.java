@@ -1,6 +1,5 @@
 package com.ruili.target.fragments;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.android.volley.Request.Method;
@@ -11,9 +10,7 @@ import com.ruili.target.R;
 import com.ruili.target.activitys.TargetListActivity;
 import com.ruili.target.adapters.MainFragmentAdapter;
 import com.ruili.target.entity.Category;
-import com.ruili.target.entity.Entity1;
 import com.ruili.target.entity.ResponseDTO;
-import com.ruili.target.entity.User;
 import com.ruili.target.utils.Constant;
 import com.ruili.target.utils.JsonUtil;
 
@@ -40,7 +37,7 @@ public class MainFragment extends ListFragment {
 
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
-		super.onListItemClick(l, v, position, id);
+		mActivity.onMainListItemClick((Category) mAdapter.getItem(position));
 	}
 
 	@Override
@@ -77,12 +74,17 @@ public class MainFragment extends ListFragment {
 	}
 	
 	private void decodeResponse(String response) {
-		ResponseDTO dto = JsonUtil.parseObject(response, ResponseDTO.class);
-		if (dto.isValid()) {
-			List<Category> categories = JsonUtil.parseSpecialArray(response, "data",Category.class);
-			mAdapter.setCategories(categories);
-		} else {
-			mActivity.getToast().show(R.string.get_data_fail);
+		try {
+			ResponseDTO dto = JsonUtil.parseObject(response, ResponseDTO.class);
+			if (dto.isValid()) {
+				List<Category> categories = JsonUtil.parseSpecialArray(response, "data",Category.class);
+				mAdapter.setCategories(categories);
+			} else {
+				mActivity.getToast().show(R.string.get_data_fail);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			mActivity.getToast().show(mActivity.getResources().getText(R.string.service_fail) + response);
 		}
 	}
 	private String getCategoryUrl() {

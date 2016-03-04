@@ -3,7 +3,8 @@ package com.ruili.target.adapters;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.ruili.target.entity.Entity1;
+import com.ruili.target.R;
+import com.ruili.target.entity.Subcategory;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -17,27 +18,32 @@ public class DetailsFragmentAdapter extends BaseAdapter {
 
 	private Context mContext;
 	private LayoutInflater mInflater;
-	private List<Entity1> mEntities;
+	private List<Subcategory> mSubcategories;
 
-	public DetailsFragmentAdapter(Context context, List<Entity1> entities) {
+	public DetailsFragmentAdapter(Context context, List<Subcategory> subcategories) {
 		super();
 		this.mContext = context;
-		if (null == entities) {
-			mEntities = new ArrayList<>();
+		if (null == subcategories) {
+			mSubcategories = new ArrayList<>();
 		} else {
-			mEntities = entities;
+			mSubcategories = subcategories;
 		}
 		mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 	}
 
+	public void setSubcategories(List<Subcategory> mSubcategories) {
+		this.mSubcategories = mSubcategories;
+		this.notifyDataSetChanged();
+	}
+
 	@Override
 	public int getCount() {
-		return mEntities.size();
+		return mSubcategories.size();
 	}
 
 	@Override
 	public Object getItem(int position) {
-		return mEntities.get(position);
+		return mSubcategories.get(position);
 	}
 
 	@Override
@@ -47,11 +53,29 @@ public class DetailsFragmentAdapter extends BaseAdapter {
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-		final Entity1 entity = mEntities.get(position);
-		return entity.getView(convertView, parent, mInflater);
+		View view = null;
+		final Subcategory subcategory = mSubcategories.get(position);
+		if (null == convertView) {
+			if (Subcategory.INDEX_TYPE_YESNO == subcategory.getIndex_type()) {
+				view = mInflater.inflate(R.layout.fragment_details_list_item1, parent, false);
+			} else if (Subcategory.INDEX_TYPE_SCORE == subcategory.getIndex_type()) {
+				view = mInflater.inflate(R.layout.fragment_details_list_item2, parent, false);
+			} else {
+				return null;
+			}
+			ViewHolder holder = new ViewHolder();
+			holder.viewState = view.findViewById(R.id.view_state);
+			view.setTag(holder);
+		} else {
+			view = convertView;
+		}
+		ViewHolder holder = new ViewHolder();
+		holder.viewState.setBackgroundResource(subcategory.getStateResourceID());
+		return view;
 	}
 
 	class ViewHolder {
+		View viewState;
 		ImageView ivNo;
 		TextView tvTitle;
 		TextView tvSummary;

@@ -3,7 +3,9 @@ package com.ruili.target.activitys;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 import com.ruili.target.R;
+import com.ruili.target.entity.Category;
 import com.ruili.target.entity.User;
+import com.ruili.target.fragments.DetailFragment;
 import com.ruili.target.fragments.MainFragment;
 
 import android.app.ActionBar;
@@ -24,6 +26,7 @@ public class TargetListActivity extends BaseActivity {
 	public static final int TYPE_INSPECT_SUPERVISE = 2;
 	private RequestQueue mQueue;
 	private MainFragment mMainFragment;
+	private DetailFragment mDetailFragment;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +44,8 @@ public class TargetListActivity extends BaseActivity {
 		FragmentManager manager = getFragmentManager();
 		mMainFragment = (MainFragment) manager.findFragmentById(R.id.fragment_main);
 		mMainFragment.setActivity(this);
+		mDetailFragment = (DetailFragment) manager.findFragmentById(R.id.fragment_detail);
+		mDetailFragment.setActivity(this);
 		initActionbar();
 	}
 
@@ -98,5 +103,9 @@ public class TargetListActivity extends BaseActivity {
 			initRequestQueue();
 		}
 		return mQueue;
+	}
+	
+	public void onMainListItemClick(Category category) {
+		mDetailFragment.updateData(category.getId(), category.getChecktime().get(0).getId(), "");;
 	}
 }
