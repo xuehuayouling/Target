@@ -14,9 +14,7 @@ import com.ruili.target.R;
 import com.ruili.target.entity.ResponseDTO;
 import com.ruili.target.entity.User;
 import com.ruili.target.utils.Constant;
-import com.ruili.target.utils.ImmediatelyShowToast;
 import com.ruili.target.utils.JsonUtil;
-import com.ruili.target.utils.ProgressDialogUtils;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -87,7 +85,7 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 						@Override
 						public void onErrorResponse(VolleyError error) {
 							mProgressDialogUtils.cancel();
-							mToast.show(error.toString());
+							mToast.show(R.string.netword_fail);
 						}
 					}) {
 

@@ -14,12 +14,6 @@
 
     <!-- Application theme. -->
     <style name="AppTheme" parent="AppBaseTheme">
-        <item name="android:actionBarStyle">@style/MyActionBar</item>
-    </style>
-
-    <style name="MyActionBar" parent="@android:style/Widget.Holo.Light.ActionBar.Solid">
-        <item name="android:background">@color/blue</item>
-        <item name="android:homeLayout">@layout/action_bar_home</item>
-        <item name="android:displayOptions">showHome</item>
+        <item name="android:windowNoTitle">true</item>
     </style>
 </resources>

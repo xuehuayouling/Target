@@ -4,21 +4,18 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 import com.ruili.target.R;
 import com.ruili.target.entity.Category;
-import com.ruili.target.entity.User;
 import com.ruili.target.fragments.DetailFragment;
 import com.ruili.target.fragments.MainFragment;
 
-import android.app.ActionBar;
 import android.app.FragmentManager;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.ImageView;
+import android.widget.SearchView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-public class TargetListActivity extends BaseActivity {
+public class TargetListActivity extends BaseActivity implements OnClickListener {
 
 	public static final String TYPE_KEY = "type";
 	public static final int TYPE_TODAY = 0;
@@ -50,48 +47,18 @@ public class TargetListActivity extends BaseActivity {
 	}
 
 	private void initActionbar() {
-		ActionBar actionBar = getActionBar();
-		actionBar.setCustomView(R.layout.widget_date_picker);
-		TextView search = (TextView) actionBar.getCustomView().findViewById(R.id.tv_date_picker);
-		search.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				Toast.makeText(TargetListActivity.this, "Search triggered", Toast.LENGTH_LONG).show();
-			}
-		});
-		actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-		actionBar.setDisplayHomeAsUpEnabled(true);
-		actionBar.setDisplayShowHomeEnabled(false);
-	}
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.main, menu);
-		switch (getUserType()) {
-		case User.TYPE_QC:
-			
-			break;
-
-		default:
-			break;
-		}
-		return true;
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		final int id = item.getItemId();
-		switch (id) {
-		case android.R.id.home:
-			finish();
-			break;
-		case R.id.action_scan:
-			mMainFragment.updateData();
-			break;
-		default:
-			break;
-		}
-		return super.onOptionsItemSelected(item);
+		ImageView ivBack = (ImageView) findViewById(R.id.iv_back);
+		ImageView ivMenu = (ImageView) findViewById(R.id.iv_menu);
+		TextView tvDate = (TextView) findViewById(R.id.tv_date);
+		TextView tvEmployee = (TextView) findViewById(R.id.tv_employee);
+		SearchView svSearch = (SearchView) findViewById(R.id.sv_search);
+		TextView tvScan = (TextView) findViewById(R.id.tv_scan);
+		ivBack.setOnClickListener(this);
+		ivMenu.setOnClickListener(this);
+		tvEmployee.setOnClickListener(this);
+		tvDate.setOnClickListener(this);
+		svSearch.setOnClickListener(this);
+		tvScan.setOnClickListener(this);
 	}
 
 	private void initRequestQueue() {
@@ -107,5 +74,19 @@ public class TargetListActivity extends BaseActivity {
 	
 	public void onMainListItemClick(Category category) {
 		mDetailFragment.updateData(1, 1, "2016-03-03");;
+	}
+
+	@Override
+	public void onClick(View v) {
+		switch (v.getId()) {
+		case R.id.iv_back:
+			finish();
+			break;
+		case R.id.tv_scan:
+			mMainFragment.updateData();
+			break;
+		default:
+			break;
+		}		
 	}
 }

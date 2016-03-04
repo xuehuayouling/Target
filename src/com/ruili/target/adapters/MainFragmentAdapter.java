@@ -16,13 +16,11 @@ import android.widget.TextView;
 
 public class MainFragmentAdapter extends BaseAdapter {
 
-	private Context mContext;
 	private LayoutInflater mInflater;
 	private List<Category> mCategories;
 
 	public MainFragmentAdapter(Context context, List<Category> categories) {
 		super();
-		this.mContext = context;
 		if (null == categories) {
 			mCategories = new ArrayList<>();
 		} else {

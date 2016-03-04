@@ -8,6 +8,8 @@ public class Subcategory {
 	public static final String STATE_UNDO = "0";
 	public static final String STATE_DONE = "1";
 	public static final String STATE_CONFIRMED = "2";
+	public static final int INDEX_COMPLETE_YES = 1;
+	public static final int INDEX_COMPLETE_NO = 0;
 	private int index_log_id;
 	private int small_index_id;
 	private String small_index_name;

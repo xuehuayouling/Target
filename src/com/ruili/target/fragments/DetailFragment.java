@@ -63,7 +63,7 @@ public class DetailFragment extends ListFragment {
 					@Override
 					public void onErrorResponse(VolleyError error) {
 						mActivity.getProgressDialogUtils().cancel();
-						mActivity.getToast().show(error.toString());
+						mActivity.getToast().show(R.string.netword_fail);
 					}
 				});
 		mActivity.getRequestQueue().add(stringRequest);
