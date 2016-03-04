@@ -70,6 +70,7 @@ public class DetailsFragmentAdapter extends BaseAdapter {
 			view = convertView;
 		}
 		ViewHolder holder = new ViewHolder();
+		holder = (ViewHolder) view.getTag();
 		holder.viewState.setBackgroundResource(subcategory.getStateResourceID());
 		return view;
 	}

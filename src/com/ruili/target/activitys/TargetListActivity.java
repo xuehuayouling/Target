@@ -106,6 +106,6 @@ public class TargetListActivity extends BaseActivity {
 	}
 	
 	public void onMainListItemClick(Category category) {
-		mDetailFragment.updateData(category.getId(), category.getChecktime().get(0).getId(), "");;
+		mDetailFragment.updateData(1, 1, "2016-03-03");;
 	}
 }
