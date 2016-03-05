@@ -2,12 +2,16 @@ package com.ruili.target.activitys;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
+import com.google.zxing.client.android.CaptureActivity;
+import com.google.zxing.client.android.Intents;
+import com.google.zxing.client.android.history.HistoryItem;
 import com.ruili.target.R;
 import com.ruili.target.entity.Category;
 import com.ruili.target.fragments.DetailFragment;
 import com.ruili.target.fragments.MainFragment;
 
 import android.app.FragmentManager;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -21,6 +25,7 @@ public class TargetListActivity extends BaseActivity implements OnClickListener 
 	public static final int TYPE_TODAY = 0;
 	public static final int TYPE_HISTORY = 1;
 	public static final int TYPE_INSPECT_SUPERVISE = 2;
+	private static final int SCAN_REQUEST_CODE = 1;
 	private RequestQueue mQueue;
 	private MainFragment mMainFragment;
 	private DetailFragment mDetailFragment;
@@ -83,10 +88,26 @@ public class TargetListActivity extends BaseActivity implements OnClickListener 
 			finish();
 			break;
 		case R.id.tv_scan:
-			mMainFragment.updateData();
+			showCaptureActivity();
+//			mMainFragment.updateData();
 			break;
 		default:
 			break;
 		}		
 	}
+	
+	private void showCaptureActivity() {
+		Intent intent = new Intent(this, CaptureActivity.class);
+		startActivityForResult(intent, SCAN_REQUEST_CODE);
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (resultCode == RESULT_OK && requestCode == SCAN_REQUEST_CODE) {
+		      String url = data.getStringExtra("codeString");
+		      mToast.show(url);
+		    }
+	}
+	
+	
 }

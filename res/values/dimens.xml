@@ -23,4 +23,7 @@
 	<dimen name="details_proof_photo_width">140.8dp</dimen>
 	<dimen name="details_proof_photo_height">140.8dp</dimen>
 	<dimen name="actionbar_height">48dp</dimen>
+	
+	<dimen name="standard_padding">8dip</dimen>
+  <dimen name="half_padding">4dip</dimen>
 </resources>
