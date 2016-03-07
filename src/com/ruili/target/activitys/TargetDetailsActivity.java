@@ -1,25 +1,43 @@
 package com.ruili.target.activitys;
 
-import com.ruili.target.R;
-import com.ruili.target.entity.Subcategory;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import android.app.Activity;
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request.Method;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import com.ruili.target.R;
+import com.ruili.target.adapters.ImageAdapter;
+import com.ruili.target.entity.PicUrl;
+import com.ruili.target.entity.Subcategory;
+import com.ruili.target.utils.Constant;
+import com.ruili.target.utils.IQiniuUploadUitlsListener;
+import com.ruili.target.utils.Logger;
+import com.ruili.target.utils.QiniuUploadUitls;
+
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.Gallery;
 import android.widget.ImageView;
 import android.widget.RadioGroup;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
-public class TargetDetailsActivity extends Activity implements OnClickListener {
+public class TargetDetailsActivity extends BaseActivity implements OnClickListener {
 	public static final String KEY_SUBCATEGORY = "subcategory";
 	private static final int REQUEST_CODE_IMAGE_CAPTURE = 300;
 	private Uri photoUri;
@@ -27,23 +45,28 @@ public class TargetDetailsActivity extends Activity implements OnClickListener {
 	private TextView mTVTitle;
 	private RadioGroup mRGState;
 	private RatingBar mRBarScore;
-
+	private Gallery mGlpics;
+	private LayoutInflater mInflater;
+	private ImageAdapter mImageAdapter;
+	private List<String> mPicPaths = new ArrayList<>();
+	protected static final String TAG = TargetDetailsActivity.class.getSimpleName();
+	private RequestQueue mQueue;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_target_details);
+		initRequestQueue();
+		mInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		ImageView imgVTakePhoto = (ImageView) findViewById(R.id.imgv_take_photo);
 		imgVTakePhoto.setOnClickListener(this);
+		TextView tvSave = (TextView) findViewById(R.id.tv_save);
+		tvSave.setOnClickListener(this);
 		mTVTitle = (TextView) findViewById(R.id.tv_title);
 		mRGState = (RadioGroup) findViewById(R.id.rg_state);
 		mRBarScore = (RatingBar) findViewById(R.id.rbar_score);
 		ImageView ivBack = (ImageView) findViewById(R.id.iv_back);
 		ivBack.setOnClickListener(this);
-	}
-
-	@Override
-	protected void onResume() {
-		super.onResume();
 		mSubcategory = (Subcategory) getIntent().getSerializableExtra(KEY_SUBCATEGORY);
 		mTVTitle.setText(mSubcategory.getSmall_index_name());
 		if (mSubcategory.getIndex_type() == Subcategory.INDEX_TYPE_SCORE) {
@@ -61,27 +84,137 @@ public class TargetDetailsActivity extends Activity implements OnClickListener {
 				mRGState.clearCheck();
 			}
 		}
+		mGlpics = (Gallery) findViewById(R.id.ll_pics);
+		mImageAdapter = new ImageAdapter(this, null);
+		mPicPaths.clear();
+		mGlpics.setAdapter(mImageAdapter);
+	}
+	
+	private void initRequestQueue() {
+		mQueue = Volley.newRequestQueue(this);
+	}
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
 	}
 
 	@Override
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.imgv_take_photo:
+			ContentValues values = new ContentValues();
+			while (photoUri == null) {
+				photoUri = this.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+			}
 			Intent intent = new Intent();
 			intent.setAction(MediaStore.ACTION_IMAGE_CAPTURE);
-			ContentValues values = new ContentValues();
-			photoUri = this.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
 			intent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
 			startActivityForResult(intent, REQUEST_CODE_IMAGE_CAPTURE);
 			break;
 		case R.id.iv_back:
 			finish();
 			break;
+		case R.id.tv_save:
+			uploadImage();
+			break;
 		default:
 			break;
 		}
 	}
 
+	private void uploadImage() {
+		if (mPicPaths.size() > 0) {
+			getProgressDialogUtils().show();
+			uploadImage(0);
+		} else {
+			save();
+		}
+	}
+	
+	private void save() {
+		getProgressDialogUtils().show();
+		StringRequest stringRequest = new StringRequest(Method.PUT, getUpdateSubCategoryUrl(mSubcategory.getIndex_log_id()),
+				new Response.Listener<String>() {
+
+					@Override
+					public void onResponse(String response) {
+						getProgressDialogUtils().cancel();
+						finish();
+					}
+				}, new Response.ErrorListener() {
+
+					@Override
+					public void onErrorResponse(VolleyError error) {
+						Logger.debug(TAG , error.toString());
+						getProgressDialogUtils().cancel();
+						getToast().show(R.string.netword_fail);
+					}
+				}) {
+
+					@Override
+					protected Map<String, String> getParams() throws AuthFailureError {
+						Map<String, String> map = new HashMap<String, String>();
+						map.put("index_complete", String.valueOf(mSubcategory.getIndex_complete()));
+						map.put("index_score", String.valueOf(mSubcategory.getIndex_score()));
+						map.put("index_remark", String.valueOf(mSubcategory.getIndex_remark()));
+						List<PicUrl> picUrls = mSubcategory.getIndex_pic();
+						String picUrlString = "";
+						if (picUrls != null) {
+							for (PicUrl picUrl : picUrls) {
+								if (picUrl.equals("")) {
+									picUrlString += picUrl.getPic_url();
+								} else {
+									picUrlString += ";" + picUrl.getPic_url();
+								}
+							}
+						}
+						map.put("index_pic", picUrlString);
+						return map;
+					}
+			
+		};
+		mQueue.add(stringRequest);
+	}
+	
+	private String getUpdateSubCategoryUrl(int indexLogId) {
+		return Constant.BASE_URL + String.format("/api/v1/index/%d/index_log", indexLogId);
+	}
+
+
+	private void uploadImage(final int id) {
+		if (mPicPaths.size() > id) {
+			String path = mPicPaths.get(0);
+			QiniuUploadUitls.getInstance().uploadImage(path, new IQiniuUploadUitlsListener() {
+				
+				@Override
+				public void onSucess(String fileUrl) {
+					List<PicUrl> picUrls = mSubcategory.getIndex_pic();
+					if (picUrls == null) {
+						picUrls = new ArrayList<>();
+					}
+					PicUrl picUrl = new PicUrl();
+					picUrl.setPic_url(fileUrl);
+					picUrls.add(picUrl);
+					mSubcategory.setIndex_pic(picUrls);
+					uploadImage(id+1);
+				}
+				
+				@Override
+				public void onProgress(int progress) {
+					
+				}
+				
+				@Override
+				public void onError(int errorCode, String msg) {
+					getProgressDialogUtils().cancel();
+					getToast().show(getString(R.string.netword_fail) + msg);
+				}
+			});
+		} else {
+			save();
+		}
+	}
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == REQUEST_CODE_IMAGE_CAPTURE) {
@@ -92,9 +225,8 @@ public class TargetDetailsActivity extends Activity implements OnClickListener {
 					int columnIndex = cursor.getColumnIndexOrThrow(pojo[0]);
 					if (cursor.moveToFirst()) {
 						String picPath = cursor.getString(columnIndex);
-						Bitmap bmap = BitmapFactory.decodeFile(picPath);
-						ImageView imageview = (ImageView) this.findViewById(R.id.imgv_photo_preview);
-						imageview.setImageBitmap(bmap);
+						mPicPaths.add(picPath);
+						mImageAdapter.setPicPaths(mPicPaths);
 					}
 					cursor.close();
 				}

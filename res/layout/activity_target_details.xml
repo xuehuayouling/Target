@@ -31,7 +31,7 @@
             android:background="@android:color/transparent" />
 
         <TextView
-            android:id="@+id/iv_save"
+            android:id="@+id/tv_save"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="center_vertical|end"
@@ -139,8 +139,8 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:gravity="center"
-            android:layout_weight="1" >
+            android:layout_weight="1"
+            android:gravity="center" >
 
             <EditText
                 android:layout_width="892dp"
@@ -154,18 +154,25 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1" >
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:padding="20dp" >
 
-            <ImageView
-                android:id="@+id/imgv_photo_preview"
-                android:layout_width="@dimen/details_proof_photo_width"
+            <Gallery
+                android:id="@+id/ll_pics"
+                android:layout_width="0dp"
                 android:layout_height="@dimen/details_proof_photo_height"
-                tools:ignore="ContentDescription" />
+                android:layout_weight="1"
+                android:spacing="20dp" >
+            </Gallery>
 
             <ImageView
                 android:id="@+id/imgv_take_photo"
-                android:layout_width="@dimen/details_proof_photo_width"
+                android:layout_width="@dimen/details_proof_photo_height"
                 android:layout_height="@dimen/details_proof_photo_height"
+                android:layout_marginEnd="10dp"
+                android:layout_marginStart="10dp"
+                android:scaleType="centerInside"
                 android:background="@drawable/ic_take_photo"
                 tools:ignore="ContentDescription" />
         </LinearLayout>
