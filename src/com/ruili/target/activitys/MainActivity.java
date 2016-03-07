@@ -77,11 +77,14 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.imgbtn_today_targets:
-		case R.id.imgbtn_history_targets:
-		case R.id.imgbtn_inspect_supervise:
 			showTargetListActivity(TargetListActivity.TYPE_TODAY);
 			break;
-
+		case R.id.imgbtn_history_targets:
+			showTargetListActivity(TargetListActivity.TYPE_HISTORY);
+			break;
+		case R.id.imgbtn_inspect_supervise:
+			showTargetListActivity(TargetListActivity.TYPE_INSPECT_SUPERVISE);
+			break;
 		case R.id.imgbtn_settings:
 			optionPopupWindow();
 			break;

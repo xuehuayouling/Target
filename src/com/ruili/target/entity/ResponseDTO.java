@@ -1,16 +1,19 @@
 package com.ruili.target.entity;
 
-public class ResponseDTO {
+public abstract class ResponseDTO {
 
-	private int error_code;
-	private String data;
+	protected int error_code = 1;
 	
-	public boolean isValid() {
-		return 0 == error_code;
+	public int getError_code() {
+		return error_code;
 	}
 	
-	public String getData() {
-		return data;
+	public void setError_code(int error_code) {
+		this.error_code = error_code;
+	}
+
+	public boolean isValid() {
+		return 0 == error_code;
 	}
 	
 }

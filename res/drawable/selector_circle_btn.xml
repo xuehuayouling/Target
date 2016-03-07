@@ -22,7 +22,7 @@
                 <shape android:shape="oval" >
                     <corners android:radius="10dp" />
 
-                    <solid android:color="#e66b4f" />
+                    <solid android:color="@color/blue" />
 
                     <size
                         android:height="162dp"
@@ -33,7 +33,7 @@
                 <shape android:shape="oval" >
                     <corners android:radius="10dp" />
 
-                    <solid android:color="#f3876f" />
+                    <solid android:color="@android:color/darker_gray" />
 
                     <size
                         android:height="162dp"

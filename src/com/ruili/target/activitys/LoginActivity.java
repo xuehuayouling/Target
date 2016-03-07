@@ -11,10 +11,11 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.ruili.target.R;
-import com.ruili.target.entity.ResponseDTO;
 import com.ruili.target.entity.User;
+import com.ruili.target.entity.UserDTO;
 import com.ruili.target.utils.Constant;
 import com.ruili.target.utils.JsonUtil;
+import com.ruili.target.utils.Logger;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -31,6 +32,7 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 	private EditText mETUserName;
 	private EditText mETPassword;
 	private RequestQueue mQueue;
+	private static final String TAG = LoginActivity.class.getSimpleName();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -107,10 +109,11 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 	}
 
 	private void decodeResponse(String response) {
+		Logger.debug(TAG, response);
 		try {
-			ResponseDTO dto = JsonUtil.parseObject(response, ResponseDTO.class);
+			UserDTO dto = JsonUtil.parseObject(response, UserDTO.class);
 			if (dto.isValid()) {
-				User user = JsonUtil.parseSpecialObject(response, "data", User.class);
+				User user = dto.getData();
 				saveUserInfo(user);
 				showMainActivity();
 			} else {

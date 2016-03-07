@@ -1,8 +1,15 @@
 package com.ruili.target.entity;
 
+import java.io.Serializable;
+import java.util.List;
+
 import com.ruili.target.R;
 
-public class Subcategory {
+public class Subcategory implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -6840782388679148494L;
 	public static final int INDEX_TYPE_YESNO = 0;
 	public static final int INDEX_TYPE_SCORE = 1;
 	public static final String STATE_UNDO = "0";
@@ -14,9 +21,27 @@ public class Subcategory {
 	private int small_index_id;
 	private String small_index_name;
 	private int index_type;
-	private int index_complete;
+	private int index_complete = -1;
 	private String index_score;
 	private String status;
+	private String index_remark;
+	private List<PicUrl> index_pic;
+
+	public List<PicUrl> getIndex_pic() {
+		return index_pic;
+	}
+
+	public void setIndex_pic(List<PicUrl> index_pic) {
+		this.index_pic = index_pic;
+	}
+
+	public String getIndex_remark() {
+		return index_remark;
+	}
+
+	public void setIndex_remark(String index_remark) {
+		this.index_remark = index_remark;
+	}
 
 	public int getIndex_log_id() {
 		return index_log_id;

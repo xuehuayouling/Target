@@ -7,15 +7,19 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.ruili.target.R;
+import com.ruili.target.activitys.TargetDetailsActivity;
 import com.ruili.target.activitys.TargetListActivity;
 import com.ruili.target.adapters.DetailsFragmentAdapter;
-import com.ruili.target.entity.ResponseDTO;
+import com.ruili.target.entity.CheckTime;
 import com.ruili.target.entity.Subcategory;
+import com.ruili.target.entity.SubcategoryDTO;
 import com.ruili.target.utils.Constant;
 import com.ruili.target.utils.JsonUtil;
 
 import android.app.ListFragment;
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,12 +28,11 @@ import android.widget.ListView;
 public class DetailFragment extends ListFragment {
 	private TargetListActivity mActivity;
 	private DetailsFragmentAdapter mAdapter;
+	private static final String TAG = DetailFragment.class.getSimpleName();
 
 	public void setActivity(TargetListActivity activity) {
 		this.mActivity = activity;
 	}
-
-	String[] cities = {};
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -38,13 +41,16 @@ public class DetailFragment extends ListFragment {
 
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
-		super.onListItemClick(l, v, position, id);
+		Intent intent = new Intent(getActivity(), TargetDetailsActivity.class);
+		final Subcategory subcategory = (Subcategory) mAdapter.getItem(position);
+		intent.putExtra(TargetDetailsActivity.KEY_SUBCATEGORY, subcategory);
+		startActivity(intent);
 	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		mAdapter = new DetailsFragmentAdapter(getActivity(), null);
+		mAdapter = new DetailsFragmentAdapter((TargetListActivity) getActivity(), null);
 		this.setListAdapter(mAdapter);
 	}
 
@@ -69,11 +75,15 @@ public class DetailFragment extends ListFragment {
 		mActivity.getRequestQueue().add(stringRequest);
 	}
 
+	public void clear() {
+		mAdapter.setSubcategories(null);
+	}
 	private void decodeResponse(String response) {
+		Log.d(TAG  , response);
 		try {
-			ResponseDTO dto = JsonUtil.parseObject(response, ResponseDTO.class);
+			SubcategoryDTO dto = JsonUtil.parseObject(response, SubcategoryDTO.class);
 			if (dto.isValid()) {
-				List<Subcategory> subcategories = JsonUtil.parseSpecialArray(response, "data", Subcategory.class);
+				List<Subcategory> subcategories = dto.getData();
 				mAdapter.setSubcategories(subcategories);
 			} else {
 				mActivity.getToast().show(R.string.get_data_fail);
@@ -84,8 +94,12 @@ public class DetailFragment extends ListFragment {
 		}
 	}
 	private String getSubCategoryUrl(int categoryId, int checktimeID, String date) {
-		String url = Constant.BASE_URL + String.format("/api/v1/index/%d/%d/%d/%s/small_indexs",
-				categoryId, mActivity.getUserOperatorID(), checktimeID, date);
+		String checktime = String.valueOf(checktimeID);
+		if (CheckTime.CHECK_TIME_NULL == checktimeID) {
+			checktime = null;
+		}
+		String url = Constant.BASE_URL + String.format("/api/v1/index/%d/%d/%s/%s/small_indexs",
+				categoryId, mActivity.getUserOperatorID(), checktime, date);
 		return url;
 	}
 

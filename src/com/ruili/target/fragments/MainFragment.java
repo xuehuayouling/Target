@@ -10,6 +10,7 @@ import com.ruili.target.R;
 import com.ruili.target.activitys.TargetListActivity;
 import com.ruili.target.adapters.MainFragmentAdapter;
 import com.ruili.target.entity.Category;
+import com.ruili.target.entity.CategoryDTO;
 import com.ruili.target.entity.ResponseDTO;
 import com.ruili.target.utils.Constant;
 import com.ruili.target.utils.JsonUtil;
@@ -17,6 +18,7 @@ import com.ruili.target.utils.JsonUtil;
 import android.app.Activity;
 import android.app.ListFragment;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +27,7 @@ import android.widget.ListView;
 public class MainFragment extends ListFragment {
 	private TargetListActivity mActivity;
 	private MainFragmentAdapter mAdapter;
+	private static final String TAG = MainFragment.class.getSimpleName();
 
 	public void setActivity(TargetListActivity activity) {
 		this.mActivity = activity;
@@ -37,7 +40,9 @@ public class MainFragment extends ListFragment {
 
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
-		mActivity.onMainListItemClick((Category) mAdapter.getItem(position));
+		final Category category = (Category) mAdapter.getItem(position);
+		mActivity.setCheckTimes(category.getChecktime());
+		mActivity.onMainListItemClick(category);
 	}
 
 	@Override
@@ -74,10 +79,11 @@ public class MainFragment extends ListFragment {
 	}
 	
 	private void decodeResponse(String response) {
+		Log.d(TAG , response);
 		try {
-			ResponseDTO dto = JsonUtil.parseObject(response, ResponseDTO.class);
+			CategoryDTO dto = JsonUtil.parseObject(response, CategoryDTO.class);
 			if (dto.isValid()) {
-				List<Category> categories = JsonUtil.parseSpecialArray(response, "data",Category.class);
+				List<Category> categories = dto.getData();
 				mAdapter.setCategories(categories);
 			} else {
 				mActivity.getToast().show(R.string.get_data_fail);

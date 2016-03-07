@@ -32,6 +32,10 @@ public class ProgressDialogUtils {
 		cancel();
 		mProgressDialog = ProgressDialog.show(mContext, mContext.getText(R.string.please_wait), text, true);
 	}
+	
+	public void show() {
+		show("");
+	}
 
 	public void cancel() {
 		if (mProgressDialog != null) {

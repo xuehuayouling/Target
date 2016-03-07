@@ -3,27 +3,28 @@
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
-	<dimen name="login_widget_width">384dp</dimen>
-	<dimen name="login_widget_height">38.4dp</dimen>
-	<dimen name="login_button_margin_bottom">176.64dp</dimen>
-	<dimen name="main_buttons_margin_bottom">54.66dp</dimen>
-	<dimen name="main_buttons_width">102.4dp</dimen>
-	<dimen name="main_buttons_height">102.4dp</dimen>
-	<dimen name="main_buttons_distance">140.7dp</dimen>
-	<dimen name="main_button_text_distance">14.72dp</dimen>
-	<dimen name="main_settings_button_width">37.5dp</dimen>
-	<dimen name="main_settings_button_height">37.5dp</dimen>
-	<dimen name="preference_item_padding_side">8dp</dimen>
-	<dimen name="preference_icon_minWidth">0dp</dimen>
-	<dimen name="preference_item_padding_inner">8dp</dimen>
-	<dimen name="main_list_item_height">70.4dp</dimen>
-	<dimen name="details_list_item_height">88.3dp</dimen>
-	<dimen name="details_list_item_indicator_width">19.8dp</dimen>
-	<dimen name="action_bar_icon_vertical_padding">8dp</dimen>
-	<dimen name="details_proof_photo_width">140.8dp</dimen>
-	<dimen name="details_proof_photo_height">140.8dp</dimen>
-	<dimen name="actionbar_height">48dp</dimen>
-	
-	<dimen name="standard_padding">8dip</dimen>
-  <dimen name="half_padding">4dip</dimen>
+    <dimen name="login_widget_width">384dp</dimen>
+    <dimen name="login_widget_height">38.4dp</dimen>
+    <dimen name="login_button_margin_bottom">176.64dp</dimen>
+    <dimen name="main_buttons_margin_bottom">54.66dp</dimen>
+    <dimen name="main_buttons_width">102.4dp</dimen>
+    <dimen name="main_buttons_height">102.4dp</dimen>
+    <dimen name="main_buttons_distance">140.7dp</dimen>
+    <dimen name="main_button_text_distance">14.72dp</dimen>
+    <dimen name="main_settings_button_width">37.5dp</dimen>
+    <dimen name="main_settings_button_height">37.5dp</dimen>
+    <dimen name="preference_item_padding_side">8dp</dimen>
+    <dimen name="preference_icon_minWidth">0dp</dimen>
+    <dimen name="preference_item_padding_inner">8dp</dimen>
+    <dimen name="main_list_item_height">70.4dp</dimen>
+    <dimen name="details_list_item_height">88.3dp</dimen>
+    <dimen name="details_list_item_indicator_width">19.8dp</dimen>
+    <dimen name="action_bar_icon_vertical_padding">8dp</dimen>
+    <dimen name="details_proof_photo_width">140.8dp</dimen>
+    <dimen name="details_proof_photo_height">140.8dp</dimen>
+    <dimen name="actionbar_height">48dp</dimen>
+    <dimen name="standard_padding">8dip</dimen>
+    <dimen name="half_padding">4dip</dimen>
+    <dimen name="popup_menu_width">128dp</dimen>
+
 </resources>
