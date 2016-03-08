@@ -129,8 +129,10 @@ public class DetailsFragmentAdapter extends BaseAdapter {
 				
 				@Override
 				public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
-					subcategory.setIndex_score(String.valueOf((int)rating));
-					updateSubcategory(subcategory);
+					if (fromUser) {
+						subcategory.setIndex_score(String.valueOf((int)rating));
+						updateSubcategory(subcategory);
+					}
 				}
 			});
 		} else {
@@ -163,21 +165,10 @@ public class DetailsFragmentAdapter extends BaseAdapter {
 					@Override
 					protected Map<String, String> getParams() throws AuthFailureError {
 						Map<String, String> map = new HashMap<String, String>();
-						map.put("index_complete",  subcategory.getIndexComplete());
+						map.put("index_complete",  String.valueOf(subcategory.getIndexComplete()));
 						map.put("index_score", String.valueOf(subcategory.getIndex_score()));
 						map.put("index_remark", String.valueOf(subcategory.getIndex_remark()));
-						List<PicUrl> picUrls = subcategory.getIndex_pic();
-						String picUrlString = "";
-						if (picUrls != null) {
-							for (PicUrl picUrl : picUrls) {
-								if (picUrl.equals("")) {
-									picUrlString += picUrl.getPic_url();
-								} else {
-									picUrlString += ";" + picUrl.getPic_url();
-								}
-							}
-						}
-						map.put("index_pic", picUrlString);
+						map.put("index_pic", String.valueOf(subcategory.getIndexPics()));
 						return map;
 					}
 			

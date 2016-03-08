@@ -26,6 +26,21 @@ public class Subcategory {
 	public List<PicUrl> getIndex_pic() {
 		return index_pic;
 	}
+	
+	public String getIndexPics() {
+		List<PicUrl> picUrls = getIndex_pic();
+		String picUrlString = null;
+		if (picUrls != null && picUrls.size() > 0) {
+			for (PicUrl picUrl : picUrls) {
+				if (picUrlString == null) {
+					picUrlString = picUrl.getPic_url();
+				} else {
+					picUrlString += ";" + picUrl.getPic_url();
+				}
+			}
+		}
+		return picUrlString;
+	}
 
 	public void setIndex_pic(List<PicUrl> index_pic) {
 		this.index_pic = index_pic;

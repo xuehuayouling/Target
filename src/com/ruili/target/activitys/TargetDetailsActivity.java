@@ -190,7 +190,6 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 
 	private void uploadImage() {
 		if (mPicPaths.size() > 0) {
-			getProgressDialogUtils().show();
 			uploadImage(0);
 		} else {
 			save();
@@ -222,21 +221,10 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 					@Override
 					protected Map<String, String> getParams() throws AuthFailureError {
 						Map<String, String> map = new HashMap<String, String>();
-						map.put("index_complete", mSubcategory.getIndexComplete());
+						map.put("index_complete", String.valueOf(mSubcategory.getIndexComplete()));
 						map.put("index_score", String.valueOf(mSubcategory.getIndex_score()));
 						map.put("index_remark", String.valueOf(mSubcategory.getIndex_remark()));
-						List<PicUrl> picUrls = mSubcategory.getIndex_pic();
-						String picUrlString = null;
-						if (picUrls != null) {
-							for (PicUrl picUrl : picUrls) {
-								if (picUrlString == null) {
-									picUrlString = picUrl.getPic_url();
-								} else {
-									picUrlString += ";" + picUrl.getPic_url();
-								}
-							}
-						}
-						map.put("index_pic", picUrlString);
+						map.put("index_pic", String.valueOf(mSubcategory.getIndexPics()));
 						return map;
 					}
 			
@@ -251,14 +239,16 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 
 	private void uploadImage(final int id) {
 		if (mPicPaths.size() > id) {
-			String path = mPicPaths.get(0);
+			String path = mPicPaths.get(id);
 			if (!path.startsWith(Constant.SonSDCardD)) {
-				return;
+				uploadImage(id+1);
 			}
+			getProgressDialogUtils().show();
 			QiniuUploadUitls.getInstance().uploadImage(getBitmap(path), new IQiniuUploadUitlsListener() {
 				
 				@Override
 				public void onSucess(String fileUrl) {
+					getProgressDialogUtils().cancel();
 					List<PicUrl> picUrls = mSubcategory.getIndex_pic();
 					if (picUrls == null) {
 						picUrls = new ArrayList<>();
