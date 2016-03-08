@@ -22,6 +22,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.RatingBar;
@@ -73,38 +74,23 @@ public class DetailsFragmentAdapter extends BaseAdapter {
 		View view = null;
 		final Subcategory subcategory = mSubcategories.get(position);
 		if (null == convertView) {
-			if (Subcategory.INDEX_TYPE_YESNO == subcategory.getIndex_type()) {
-				view = mInflater.inflate(R.layout.fragment_details_list_item1, parent, false);
-			} else if (Subcategory.INDEX_TYPE_SCORE == subcategory.getIndex_type()) {
-				view = mInflater.inflate(R.layout.fragment_details_list_item2, parent, false);
-			} else {
-				return null;
-			}
+			view = mInflater.inflate(R.layout.fragment_details_list_item, parent, false);
 			ViewHolder holder = new ViewHolder();
 			holder.viewState = view.findViewById(R.id.view_state);
 			holder.rgState = (RadioGroup) view.findViewById(R.id.rg_state);
 			holder.tvTitle = (TextView) view.findViewById(R.id.tv_title);
 			holder.rbarScore = (RatingBar) view.findViewById(R.id.rbar_score);
+			holder.llScore = (LinearLayout) view.findViewById(R.id.ll_score);
 			view.setTag(holder);
 		} else {
-			ViewHolder holder = (ViewHolder) convertView.getTag();
-			if (holder.rgState == null && Subcategory.INDEX_TYPE_YESNO == subcategory.getIndex_type()) {
-				view = mInflater.inflate(R.layout.fragment_details_list_item1, parent, false);
-			} else if (holder.rbarScore == null && Subcategory.INDEX_TYPE_SCORE == subcategory.getIndex_type()){
-				view = mInflater.inflate(R.layout.fragment_details_list_item2, parent, false);
-			} else {
-				view = convertView;
-			}
-			holder.viewState = view.findViewById(R.id.view_state);
-			holder.rgState = (RadioGroup) view.findViewById(R.id.rg_state);
-			holder.tvTitle = (TextView) view.findViewById(R.id.tv_title);
-			holder.rbarScore = (RatingBar) view.findViewById(R.id.rbar_score);
-			view.setTag(holder);
+			view = convertView;
 		}
 		ViewHolder holder = (ViewHolder) view.getTag();
 		holder.viewState.setBackgroundResource(subcategory.getStateResourceID());
 		holder.tvTitle.setText(subcategory.getSmall_index_name());
 		if (Subcategory.INDEX_TYPE_YESNO == subcategory.getIndex_type()) {
+			holder.llScore.setVisibility(View.GONE);
+			holder.rgState.setVisibility(View.VISIBLE);
 			if (subcategory.getIndex_complete() == Subcategory.INDEX_COMPLETE_YES) {
 				holder.rgState.check(R.id.rbtn_yes);
 			} else if (subcategory.getIndex_complete() == Subcategory.INDEX_COMPLETE_NO) {
@@ -130,6 +116,8 @@ public class DetailsFragmentAdapter extends BaseAdapter {
 				}
 			});
 		} else if (Subcategory.INDEX_TYPE_SCORE == subcategory.getIndex_type()) {
+			holder.rgState.setVisibility(View.GONE);
+			holder.llScore.setVisibility(View.VISIBLE);
 			int score;
 			try {
 				score = Integer.valueOf(subcategory.getIndex_score());
@@ -203,6 +191,7 @@ public class DetailsFragmentAdapter extends BaseAdapter {
 	
 	class ViewHolder {
 		View viewState;
+		LinearLayout llScore;
 		RatingBar rbarScore;
 		RadioGroup rgState;
 		TextView tvTitle;

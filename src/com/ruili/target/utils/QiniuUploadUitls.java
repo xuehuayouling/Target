@@ -37,9 +37,9 @@ public class QiniuUploadUitls {
 	/** 你所创建的空间的名称 */
 	private static final String bucketName = BUCKET_NAME;
 
-	private static final String fileName = "temp.jpg";
+	private static final String fileName = ".jpg";
 
-	private static final String tempJpeg = Environment.getExternalStorageDirectory().getPath() + "/" + fileName;
+	private static final String tempJpeg = Environment.getExternalStorageDirectory().getPath() + "/" + System.currentTimeMillis() + fileName;
 	private static QiniuUploadUitls qiniuUploadUitls = null;
 	private UploadManager uploadManager = new UploadManager();
 	private int maxWidth = 720;
@@ -98,6 +98,12 @@ public class QiniuUploadUitls {
 			}
 		}
 		return bitmap;
+	}
+	
+	public void uploadImage(Bitmap bitmap, IQiniuUploadUitlsListener listener) {
+
+		saveBitmapToJpegFile(bitmap, tempJpeg);
+		uploadImage(tempJpeg, listener);
 	}
 
 	public void uploadImage(Bitmap bitmap, String imgUrl, IQiniuUploadUitlsListener listener) {

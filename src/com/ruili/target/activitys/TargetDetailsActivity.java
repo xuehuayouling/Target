@@ -10,6 +10,9 @@ import com.android.volley.Request.Method;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.ImageLoader;
+import com.android.volley.toolbox.ImageLoader.ImageCache;
+import com.android.volley.toolbox.ImageLoader.ImageListener;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.ruili.target.R;
@@ -19,6 +22,7 @@ import com.ruili.target.entity.Subcategory;
 import com.ruili.target.entity.SubcategoryDTO;
 import com.ruili.target.utils.Constant;
 import com.ruili.target.utils.IQiniuUploadUitlsListener;
+import com.ruili.target.utils.ImageTool;
 import com.ruili.target.utils.JsonUtil;
 import com.ruili.target.utils.Logger;
 import com.ruili.target.utils.QiniuUploadUitls;
@@ -27,6 +31,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -143,8 +148,17 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 				}
 			}
 			mETRemark.setText(mSubcategory.getIndex_remark());
+			final List<PicUrl> picUrls = mSubcategory.getIndex_pic();
+			if (picUrls != null) {
+				for (PicUrl picUrl : picUrls) {
+					mPicPaths.add(picUrl.getPic_url());
+					mImageAdapter.setPicPaths(mPicPaths);
+					
+				}
+			}
 		}
 	}
+	
 	private String getSubCategoryUrl(int categoryId) {
 		String url = Constant.BASE_URL + String.format("/api/v1/index/%d//index_log",
 				categoryId);
@@ -238,7 +252,10 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 	private void uploadImage(final int id) {
 		if (mPicPaths.size() > id) {
 			String path = mPicPaths.get(0);
-			QiniuUploadUitls.getInstance().uploadImage(path, new IQiniuUploadUitlsListener() {
+			if (!path.startsWith(Constant.SonSDCardD)) {
+				return;
+			}
+			QiniuUploadUitls.getInstance().uploadImage(getBitmap(path), new IQiniuUploadUitlsListener() {
 				
 				@Override
 				public void onSucess(String fileUrl) {
@@ -268,6 +285,11 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 			save();
 		}
 	}
+	
+	private Bitmap getBitmap(String picPath) {
+		return ImageTool.compressBitmap(picPath, 200, 150);
+	}
+	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == REQUEST_CODE_IMAGE_CAPTURE) {
