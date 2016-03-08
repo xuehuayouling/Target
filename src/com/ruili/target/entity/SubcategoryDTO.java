@@ -1,17 +1,15 @@
 package com.ruili.target.entity;
 
-import java.util.List;
-
 public class SubcategoryDTO extends ResponseDTO {
 
-	private List<Subcategory> data;
+	private Subcategory data;
 
-	public List<Subcategory> getData() {
+	public Subcategory getData() {
 		return data;
 	}
 
-	public void setData(List<Subcategory> data) {
+	public void setData(Subcategory data) {
 		this.data = data;
 	}
-	
+
 }

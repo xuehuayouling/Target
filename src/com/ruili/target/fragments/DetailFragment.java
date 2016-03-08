@@ -12,7 +12,7 @@ import com.ruili.target.activitys.TargetListActivity;
 import com.ruili.target.adapters.DetailsFragmentAdapter;
 import com.ruili.target.entity.CheckTime;
 import com.ruili.target.entity.Subcategory;
-import com.ruili.target.entity.SubcategoryDTO;
+import com.ruili.target.entity.SubcategoryListDTO;
 import com.ruili.target.utils.Constant;
 import com.ruili.target.utils.JsonUtil;
 
@@ -43,7 +43,7 @@ public class DetailFragment extends ListFragment {
 	public void onListItemClick(ListView l, View v, int position, long id) {
 		Intent intent = new Intent(getActivity(), TargetDetailsActivity.class);
 		final Subcategory subcategory = (Subcategory) mAdapter.getItem(position);
-		intent.putExtra(TargetDetailsActivity.KEY_SUBCATEGORY, subcategory);
+		intent.putExtra(TargetDetailsActivity.KEY_SUBCATEGORY, subcategory.getIndex_log_id());
 		startActivity(intent);
 	}
 
@@ -81,7 +81,7 @@ public class DetailFragment extends ListFragment {
 	private void decodeResponse(String response) {
 		Log.d(TAG  , response);
 		try {
-			SubcategoryDTO dto = JsonUtil.parseObject(response, SubcategoryDTO.class);
+			SubcategoryListDTO dto = JsonUtil.parseObject(response, SubcategoryListDTO.class);
 			if (dto.isValid()) {
 				List<Subcategory> subcategories = dto.getData();
 				mAdapter.setSubcategories(subcategories);

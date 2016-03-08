@@ -16,8 +16,10 @@ import com.ruili.target.R;
 import com.ruili.target.adapters.ImageAdapter;
 import com.ruili.target.entity.PicUrl;
 import com.ruili.target.entity.Subcategory;
+import com.ruili.target.entity.SubcategoryDTO;
 import com.ruili.target.utils.Constant;
 import com.ruili.target.utils.IQiniuUploadUitlsListener;
+import com.ruili.target.utils.JsonUtil;
 import com.ruili.target.utils.Logger;
 import com.ruili.target.utils.QiniuUploadUitls;
 
@@ -28,9 +30,11 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.EditText;
 import android.widget.Gallery;
 import android.widget.ImageView;
 import android.widget.RadioGroup;
@@ -45,6 +49,7 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 	private TextView mTVTitle;
 	private RadioGroup mRGState;
 	private RatingBar mRBarScore;
+	private EditText mETRemark;
 	private Gallery mGlpics;
 	private LayoutInflater mInflater;
 	private ImageAdapter mImageAdapter;
@@ -65,25 +70,9 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 		mTVTitle = (TextView) findViewById(R.id.tv_title);
 		mRGState = (RadioGroup) findViewById(R.id.rg_state);
 		mRBarScore = (RatingBar) findViewById(R.id.rbar_score);
+		mETRemark = (EditText) findViewById(R.id.et_remark);
 		ImageView ivBack = (ImageView) findViewById(R.id.iv_back);
 		ivBack.setOnClickListener(this);
-		mSubcategory = (Subcategory) getIntent().getSerializableExtra(KEY_SUBCATEGORY);
-		mTVTitle.setText(mSubcategory.getSmall_index_name());
-		if (mSubcategory.getIndex_type() == Subcategory.INDEX_TYPE_SCORE) {
-			mRGState.setVisibility(View.GONE);
-			mRBarScore.setVisibility(View.VISIBLE);
-			mRBarScore.setRating(Integer.valueOf(mSubcategory.getIndex_score()));
-		} else {
-			mRGState.setVisibility(View.VISIBLE);
-			mRBarScore.setVisibility(View.GONE);
-			if (mSubcategory.getIndex_complete() == Subcategory.INDEX_COMPLETE_YES) {
-				mRGState.check(R.id.rbtn_yes);
-			} else if (mSubcategory.getIndex_complete() == Subcategory.INDEX_COMPLETE_NO) {
-				mRGState.check(R.id.rbtn_no);
-			} else {
-				mRGState.clearCheck();
-			}
-		}
 		mGlpics = (Gallery) findViewById(R.id.ll_pics);
 		mImageAdapter = new ImageAdapter(this, null);
 		mPicPaths.clear();
@@ -97,8 +86,70 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 	@Override
 	protected void onResume() {
 		super.onResume();
+		if (mSubcategory == null) {
+			getProgressDialogUtils().show("");
+			StringRequest stringRequest = new StringRequest(Method.GET, getSubCategoryUrl(getIntent().getIntExtra(KEY_SUBCATEGORY, -1)),
+					new Response.Listener<String>() {
+
+						@Override
+						public void onResponse(String response) {
+							getProgressDialogUtils().cancel();
+							decodeResponse(response);
+						}
+					}, new Response.ErrorListener() {
+
+						@Override
+						public void onErrorResponse(VolleyError error) {
+							getProgressDialogUtils().cancel();
+							getToast().show(R.string.netword_fail);
+						}
+					});
+			mQueue.add(stringRequest);
+		}
+	}
+	
+	private void decodeResponse(String response) {
+		Log.d(TAG  , response);
+		try {
+			SubcategoryDTO dto = JsonUtil.parseObject(response, SubcategoryDTO.class);
+			if (dto.isValid()) {
+				mSubcategory = dto.getData();
+				refreshView();
+			} else {
+				getToast().show(R.string.get_data_fail);
+			}
+		} catch (Exception e) {
+			getToast().show(getResources().getText(R.string.service_fail) + response);
+			e.printStackTrace();
+		}
 	}
 
+	private void refreshView() {
+		if (mSubcategory != null) {
+			mTVTitle.setText(mSubcategory.getSmall_index_name());
+			if (mSubcategory.getIndex_type() == Subcategory.INDEX_TYPE_SCORE) {
+				mRGState.setVisibility(View.GONE);
+				mRBarScore.setVisibility(View.VISIBLE);
+				mRBarScore.setRating(Integer.valueOf(mSubcategory.getIndex_score()));
+			} else {
+				mRGState.setVisibility(View.VISIBLE);
+				mRBarScore.setVisibility(View.GONE);
+				if (mSubcategory.getIndex_complete() == Subcategory.INDEX_COMPLETE_YES) {
+					mRGState.check(R.id.rbtn_yes);
+				} else if (mSubcategory.getIndex_complete() == Subcategory.INDEX_COMPLETE_NO) {
+					mRGState.check(R.id.rbtn_no);
+				} else {
+					mRGState.clearCheck();
+				}
+			}
+			mETRemark.setText(mSubcategory.getIndex_remark());
+		}
+	}
+	private String getSubCategoryUrl(int categoryId) {
+		String url = Constant.BASE_URL + String.format("/api/v1/index/%d//index_log",
+				categoryId);
+		return url;
+	}
 	@Override
 	public void onClick(View v) {
 		switch (v.getId()) {
@@ -133,6 +184,8 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 	}
 	
 	private void save() {
+		mSubcategory.setIndex_score(String.valueOf((int) mRBarScore.getRating()));
+		mSubcategory.setIndex_remark(mETRemark.getText().toString());
 		getProgressDialogUtils().show();
 		StringRequest stringRequest = new StringRequest(Method.PUT, getUpdateSubCategoryUrl(mSubcategory.getIndex_log_id()),
 				new Response.Listener<String>() {
@@ -159,11 +212,11 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 						map.put("index_score", String.valueOf(mSubcategory.getIndex_score()));
 						map.put("index_remark", String.valueOf(mSubcategory.getIndex_remark()));
 						List<PicUrl> picUrls = mSubcategory.getIndex_pic();
-						String picUrlString = "";
+						String picUrlString = null;
 						if (picUrls != null) {
 							for (PicUrl picUrl : picUrls) {
-								if (picUrl.equals("")) {
-									picUrlString += picUrl.getPic_url();
+								if (picUrlString == null) {
+									picUrlString = picUrl.getPic_url();
 								} else {
 									picUrlString += ";" + picUrl.getPic_url();
 								}

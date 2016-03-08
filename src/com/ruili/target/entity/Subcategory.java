@@ -5,11 +5,7 @@ import java.util.List;
 
 import com.ruili.target.R;
 
-public class Subcategory implements Serializable {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -6840782388679148494L;
+public class Subcategory {
 	public static final int INDEX_TYPE_YESNO = 0;
 	public static final int INDEX_TYPE_SCORE = 1;
 	public static final String STATE_UNDO = "0";
