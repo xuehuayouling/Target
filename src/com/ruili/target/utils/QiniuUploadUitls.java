@@ -113,7 +113,7 @@ public class QiniuUploadUitls {
 	}
 
 	public void uploadImage(String filePath, final IQiniuUploadUitlsListener listener) {
-		final String fileUrlUUID = filePath.replace(Constant.SonSDCardD, "");// getFileUrlUUID();
+		final String fileUrlUUID = filePath.replace(Environment.getExternalStorageDirectory().getPath() + "/", "");// getFileUrlUUID();
 		String token = getToken();
 		if (token == null) {
 			if (listener != null) {

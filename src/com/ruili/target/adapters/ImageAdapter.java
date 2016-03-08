@@ -11,10 +11,12 @@ import com.android.volley.toolbox.ImageLoader.ImageListener;
 import com.ruili.target.R;
 import com.ruili.target.utils.Constant;
 import com.ruili.target.utils.ImageTool;
+import com.ruili.target.utils.TextUtil;
 
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.LruCache;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +29,7 @@ public class ImageAdapter extends BaseAdapter {
 	private List<String> mPicPaths;
 	private LayoutInflater mInflater;
 	private RequestQueue mQueue;
+	private BitmapCache mBitmapCache;
 
 	public ImageAdapter(Context context, List<String> picPaths) {
 		super();
@@ -38,6 +41,7 @@ public class ImageAdapter extends BaseAdapter {
 		}
 		mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		mQueue = Volley.newRequestQueue(context);
+		mBitmapCache = new BitmapCache();
 	}
 
 	public void setPicPaths(List<String> picPaths) {
@@ -87,22 +91,16 @@ public class ImageAdapter extends BaseAdapter {
 	}
 
 	private void downLoadPic(String picUrl, ImageView imageView) {
-		ImageLoader imageLoader = new ImageLoader(mQueue, new ImageCache() {  
-		    @Override  
-		    public void putBitmap(String url, Bitmap bitmap) {  
-		    }  
-		  
-		    @Override  
-		    public Bitmap getBitmap(String url) {  
-		        return null;  
-		    }  
-		});  
+		ImageLoader imageLoader = new ImageLoader(mQueue, mBitmapCache);  
 		ImageListener listener = ImageLoader.getImageListener(imageView,  
 		        R.drawable.ic_arrow_right, R.drawable.ic_arrow_left);
 		imageLoader.get(Constant.getPicUrl(picUrl), listener);  
 	}
 	
 	private Bitmap getBitmap(String picPath) {
+		if (TextUtil.isEmpty(picPath)) {
+			return null;
+		}
 		return ImageTool.compressBitmap(picPath, 200, 150);
 	}
 
@@ -110,4 +108,29 @@ public class ImageAdapter extends BaseAdapter {
 		ImageView imgvPic;
 	}
 
+	public class BitmapCache implements ImageCache {  
+		  
+	    private LruCache<String, Bitmap> mCache;  
+	  
+	    public BitmapCache() {  
+	        int maxSize = 5 * 1024 * 1024;  
+	        mCache = new LruCache<String, Bitmap>(maxSize) {  
+	            @Override  
+	            protected int sizeOf(String key, Bitmap bitmap) {  
+	                return bitmap.getRowBytes() * bitmap.getHeight();  
+	            }  
+	        };  
+	    }  
+	  
+	    @Override  
+	    public Bitmap getBitmap(String url) {  
+	        return mCache.get(url);  
+	    }  
+	  
+	    @Override  
+	    public void putBitmap(String url, Bitmap bitmap) {  
+	        mCache.put(url, bitmap);  
+	    }  
+	  
+	}  
 }

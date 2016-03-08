@@ -188,8 +188,15 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 		}
 	}
 
+	private List<String> mNeedUploadPicPaths;
 	private void uploadImage() {
 		if (mPicPaths.size() > 0) {
+			mNeedUploadPicPaths = new ArrayList<>();
+			for (String path : mPicPaths) {
+				if (path.startsWith(Constant.CAMERA_FILE_PATH)) {
+					mNeedUploadPicPaths.add(path);
+				}
+			}
 			uploadImage(0);
 		} else {
 			save();
@@ -238,16 +245,14 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 
 
 	private void uploadImage(final int id) {
-		if (mPicPaths.size() > id) {
-			String path = mPicPaths.get(id);
-			if (!path.startsWith(Constant.SonSDCardD)) {
-				uploadImage(id+1);
-			}
+		if (mNeedUploadPicPaths.size() > id) {
+			String path = mNeedUploadPicPaths.get(id);
 			getProgressDialogUtils().show();
 			QiniuUploadUitls.getInstance().uploadImage(getBitmap(path), new IQiniuUploadUitlsListener() {
 				
 				@Override
 				public void onSucess(String fileUrl) {
+					Logger.debug(TAG, fileUrl);
 					getProgressDialogUtils().cancel();
 					List<PicUrl> picUrls = mSubcategory.getIndex_pic();
 					if (picUrls == null) {
