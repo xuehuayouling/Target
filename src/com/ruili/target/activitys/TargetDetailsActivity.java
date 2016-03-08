@@ -222,7 +222,7 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 					@Override
 					protected Map<String, String> getParams() throws AuthFailureError {
 						Map<String, String> map = new HashMap<String, String>();
-						map.put("index_complete", String.valueOf(mSubcategory.getIndex_complete()));
+						map.put("index_complete", mSubcategory.getIndexComplete());
 						map.put("index_score", String.valueOf(mSubcategory.getIndex_score()));
 						map.put("index_remark", String.valueOf(mSubcategory.getIndex_remark()));
 						List<PicUrl> picUrls = mSubcategory.getIndex_pic();

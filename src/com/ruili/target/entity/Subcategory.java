@@ -75,6 +75,13 @@ public class Subcategory {
 		return index_complete;
 	}
 
+	public String getIndexComplete() {
+		if (index_complete == -1) {
+			return null;
+		} else {
+			return String.valueOf(index_complete);
+		}
+	}
 	public void setIndex_complete(int index_complete) {
 		this.index_complete = index_complete;
 	}

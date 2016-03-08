@@ -163,7 +163,7 @@ public class DetailsFragmentAdapter extends BaseAdapter {
 					@Override
 					protected Map<String, String> getParams() throws AuthFailureError {
 						Map<String, String> map = new HashMap<String, String>();
-						map.put("index_complete", String.valueOf(subcategory.getIndex_complete()));
+						map.put("index_complete",  subcategory.getIndexComplete());
 						map.put("index_score", String.valueOf(subcategory.getIndex_score()));
 						map.put("index_remark", String.valueOf(subcategory.getIndex_remark()));
 						List<PicUrl> picUrls = subcategory.getIndex_pic();
