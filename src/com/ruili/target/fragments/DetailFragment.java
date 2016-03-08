@@ -29,7 +29,9 @@ public class DetailFragment extends ListFragment {
 	private TargetListActivity mActivity;
 	private DetailsFragmentAdapter mAdapter;
 	private static final String TAG = DetailFragment.class.getSimpleName();
-
+	private int mCategoryId;
+	private int mCheckTimeId = CheckTime.CHECK_TIME_NULL;
+	private String mDate;
 	public void setActivity(TargetListActivity activity) {
 		this.mActivity = activity;
 	}
@@ -55,8 +57,20 @@ public class DetailFragment extends ListFragment {
 	}
 
 	public void updateData(int categoryId, int checktimeID, String date) {
+		mCategoryId = categoryId;
+		mCheckTimeId = checktimeID;
+		mDate = date;
+		reloadData();
+	}
+	
+	public void setCheckTimeID(int checkTimeID) {
+		mCheckTimeId = checkTimeID;
+		reloadData();
+	}
+	
+	private void reloadData() {
 		mActivity.getProgressDialogUtils().show("");
-		StringRequest stringRequest = new StringRequest(Method.GET, getSubCategoryUrl(categoryId, checktimeID, date),
+		StringRequest stringRequest = new StringRequest(Method.GET, getSubCategoryUrl(),
 				new Response.Listener<String>() {
 
 					@Override
@@ -74,32 +88,32 @@ public class DetailFragment extends ListFragment {
 				});
 		mActivity.getRequestQueue().add(stringRequest);
 	}
-
+ 
 	public void clear() {
 		mAdapter.setSubcategories(null);
 	}
 	private void decodeResponse(String response) {
-		Log.d(TAG  , response);
+		Log.d(TAG, response);
 		try {
 			SubcategoryListDTO dto = JsonUtil.parseObject(response, SubcategoryListDTO.class);
 			if (dto.isValid()) {
 				List<Subcategory> subcategories = dto.getData();
 				mAdapter.setSubcategories(subcategories);
 			} else {
-				mActivity.getToast().show(R.string.get_data_fail);
+				mActivity.getToast().show(mActivity.getString(R.string.get_data_fail) + response);
 			}
 		} catch (Exception e) {
 			mActivity.getToast().show(mActivity.getResources().getText(R.string.service_fail) + response);
 			e.printStackTrace();
 		}
 	}
-	private String getSubCategoryUrl(int categoryId, int checktimeID, String date) {
-		String checktime = String.valueOf(checktimeID);
-		if (CheckTime.CHECK_TIME_NULL == checktimeID) {
+	private String getSubCategoryUrl() {
+		String checktime = String.valueOf(mCheckTimeId);
+		if (CheckTime.CHECK_TIME_NULL == mCheckTimeId) {
 			checktime = null;
 		}
 		String url = Constant.BASE_URL + String.format("/api/v1/index/%d/%d/%s/%s/small_indexs",
-				categoryId, mActivity.getUserOperatorID(), checktime, date);
+				mCategoryId, mActivity.getUserOperatorID(), checktime, mDate);
 		return url;
 	}
 

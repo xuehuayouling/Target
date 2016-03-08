@@ -87,10 +87,21 @@ public class DetailsFragmentAdapter extends BaseAdapter {
 			holder.rbarScore = (RatingBar) view.findViewById(R.id.rbar_score);
 			view.setTag(holder);
 		} else {
-			view = convertView;
+			ViewHolder holder = (ViewHolder) convertView.getTag();
+			if (holder.rgState == null && Subcategory.INDEX_TYPE_YESNO == subcategory.getIndex_type()) {
+				view = mInflater.inflate(R.layout.fragment_details_list_item1, parent, false);
+			} else if (holder.rbarScore == null && Subcategory.INDEX_TYPE_SCORE == subcategory.getIndex_type()){
+				view = mInflater.inflate(R.layout.fragment_details_list_item2, parent, false);
+			} else {
+				view = convertView;
+			}
+			holder.viewState = view.findViewById(R.id.view_state);
+			holder.rgState = (RadioGroup) view.findViewById(R.id.rg_state);
+			holder.tvTitle = (TextView) view.findViewById(R.id.tv_title);
+			holder.rbarScore = (RatingBar) view.findViewById(R.id.rbar_score);
+			view.setTag(holder);
 		}
-		ViewHolder holder = new ViewHolder();
-		holder = (ViewHolder) view.getTag();
+		ViewHolder holder = (ViewHolder) view.getTag();
 		holder.viewState.setBackgroundResource(subcategory.getStateResourceID());
 		holder.tvTitle.setText(subcategory.getSmall_index_name());
 		if (Subcategory.INDEX_TYPE_YESNO == subcategory.getIndex_type()) {

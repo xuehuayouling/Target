@@ -101,7 +101,11 @@ public class TargetListActivity extends BaseActivity implements OnClickListener 
 	}
 
 	public void onMainListItemClick(Category category) {
-		mDetailFragment.updateData(1, -1, null);
+		updateDetailsList(category.getId(), -1, null);
+	}
+	
+	private void updateDetailsList(int categoryId, int checktimeID, String date) {
+		mDetailFragment.updateData(categoryId, checktimeID, date);
 	}
 
 	@Override
@@ -166,7 +170,8 @@ public class TargetListActivity extends BaseActivity implements OnClickListener 
 
 					@Override
 					public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-						
+						mDetailFragment.setCheckTimeID(mTimeMenuAdapter.getItem(position).getId());
+						dismissTimeMenus();
 					}
 				});
 				mTimeMenus = new PopupWindow(view, getResources().getDimensionPixelSize(R.dimen.popup_menu_width), LayoutParams.WRAP_CONTENT);
