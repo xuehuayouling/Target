@@ -79,6 +79,7 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 
 						@Override
 						public void onResponse(String response) {
+							Logger.debug(TAG, "login success -->  " + response);
 							mProgressDialogUtils.cancel();
 							decodeResponse(response);
 						}
@@ -86,6 +87,7 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 
 						@Override
 						public void onErrorResponse(VolleyError error) {
+							Logger.debug(TAG, "login fail -->  " + error.toString());
 							mProgressDialogUtils.cancel();
 							mToast.show(R.string.netword_fail);
 						}

@@ -14,6 +14,7 @@ import com.ruili.target.entity.CategoryDTO;
 import com.ruili.target.entity.ResponseDTO;
 import com.ruili.target.utils.Constant;
 import com.ruili.target.utils.JsonUtil;
+import com.ruili.target.utils.Logger;
 
 import android.app.Activity;
 import android.app.ListFragment;
@@ -36,6 +37,15 @@ public class MainFragment extends ListFragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		return inflater.inflate(R.layout.fragment_main, container, false);
+	}
+
+	
+	@Override
+	public void onResume() {
+		super.onResume();
+		if (!(mAdapter.getCount() > 0)) {
+			updateData();
+		}
 	}
 
 	@Override
@@ -64,6 +74,7 @@ public class MainFragment extends ListFragment {
 
 					@Override
 					public void onResponse(String response) {
+						Logger.debug(TAG, "updateData success -->   " + response);
 						mActivity.getProgressDialogUtils().cancel();
 						decodeResponse(response);
 					}
@@ -71,6 +82,7 @@ public class MainFragment extends ListFragment {
 
 					@Override
 					public void onErrorResponse(VolleyError error) {
+						Logger.debug(TAG, "updateData fail -->  " + error.toString());
 						mActivity.getProgressDialogUtils().cancel();
 						mActivity.getToast().show(R.string.netword_fail);
 					}

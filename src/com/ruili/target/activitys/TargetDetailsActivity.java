@@ -92,6 +92,10 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 	@Override
 	protected void onResume() {
 		super.onResume();
+		update();
+	}
+	
+	private void update() {
 		if (mSubcategory == null) {
 			getProgressDialogUtils().show("");
 			StringRequest stringRequest = new StringRequest(Method.GET, getSubCategoryUrl(getIntent().getIntExtra(KEY_SUBCATEGORY, -1)),
@@ -99,6 +103,7 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 
 						@Override
 						public void onResponse(String response) {
+							Logger.debug(TAG, "update success -->  " + response);
 							getProgressDialogUtils().cancel();
 							decodeResponse(response);
 						}
@@ -106,6 +111,7 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 
 						@Override
 						public void onErrorResponse(VolleyError error) {
+							Logger.debug(TAG, "update fail -->  " + error.toString());
 							getProgressDialogUtils().cancel();
 							getToast().show(R.string.netword_fail);
 						}
@@ -262,6 +268,7 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 	private void uploadImage(final int id) {
 		if (mNeedUploadPicPaths.size() > id) {
 			String path = mNeedUploadPicPaths.get(id);
+			Logger.debug(TAG, "uploadImage --> picPath: " + path);
 			getProgressDialogUtils().show();
 			QiniuUploadUitls.getInstance().uploadImage(getBitmap(path), new IQiniuUploadUitlsListener() {
 				

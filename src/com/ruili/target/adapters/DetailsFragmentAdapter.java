@@ -148,14 +148,14 @@ public class DetailsFragmentAdapter extends BaseAdapter {
 
 					@Override
 					public void onResponse(String response) {
+						Logger.debug(TAG, "updateSubcategory success -->   " + response);
 						mActivity.getProgressDialogUtils().cancel();
-						mActivity.getToast().show(response);
 					}
 				}, new Response.ErrorListener() {
 
 					@Override
 					public void onErrorResponse(VolleyError error) {
-						Logger.debug(TAG, error.toString());
+						Logger.debug(TAG, "updateSubcategory success -->   " + error.toString());
 						mActivity.getProgressDialogUtils().cancel();
 						mActivity.getToast().show(R.string.netword_fail);
 					}

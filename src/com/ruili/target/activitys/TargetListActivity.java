@@ -1,6 +1,10 @@
 package com.ruili.target.activitys;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import com.android.volley.Request.Method;
 import com.android.volley.RequestQueue;
@@ -15,6 +19,7 @@ import com.ruili.target.entity.CheckTime;
 import com.ruili.target.fragments.DetailFragment;
 import com.ruili.target.fragments.MainFragment;
 import com.ruili.target.utils.Constant;
+import com.ruili.target.utils.Logger;
 
 import android.app.FragmentManager;
 import android.content.Context;
@@ -101,7 +106,9 @@ public class TargetListActivity extends BaseActivity implements OnClickListener 
 	}
 
 	public void onMainListItemClick(Category category) {
-		updateDetailsList(category.getId(), -1, null);
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.US);  
+        String data =format.format(new Date());  
+		updateDetailsList(category.getId(), -1, data);
 	}
 	
 	private void updateDetailsList(int categoryId, int checktimeID, String date) {
@@ -145,6 +152,7 @@ public class TargetListActivity extends BaseActivity implements OnClickListener 
 
 	private PopupWindow mTimeMenus;
 	private ArrayAdapter<CheckTime> mTimeMenuAdapter;
+	protected static final String TAG = TargetListActivity.class.getSimpleName();
 
 	private void showOrHideTimeMenus() {
 		if (mTimeMenus != null && mTimeMenus.isShowing()) {
@@ -207,14 +215,15 @@ public class TargetListActivity extends BaseActivity implements OnClickListener 
 
 					@Override
 					public void onResponse(String response) {
+						Logger.debug(TAG , "decodeBarcode success -->  " + response);
 						mProgressDialogUtils.cancel();
-//						mToast.show(response);
 						mMainFragment.updateData();
 					}
 				}, new Response.ErrorListener() {
 
 					@Override
 					public void onErrorResponse(VolleyError error) {
+						Logger.debug(TAG, "decodeBarcode fail -->  " + error.toString());
 						mProgressDialogUtils.cancel();
 						mToast.show(R.string.netword_fail);
 					}

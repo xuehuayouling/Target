@@ -40,6 +40,8 @@ public class QiniuUploadUitls {
 	private static final String fileName = ".jpg";
 
 	private static final String tempJpeg = Environment.getExternalStorageDirectory().getPath() + "/" + System.currentTimeMillis() + fileName;
+	private static final String EXTERNAL_STORAGE_DIRECTORY = Environment.getExternalStorageDirectory().getPath() + "/";
+	private static final String FILE_TYPE_STR = ".jpg";
 	private static QiniuUploadUitls qiniuUploadUitls = null;
 	private UploadManager uploadManager = new UploadManager();
 	private int maxWidth = 720;
@@ -101,13 +103,12 @@ public class QiniuUploadUitls {
 	}
 	
 	public void uploadImage(Bitmap bitmap, IQiniuUploadUitlsListener listener) {
-
-		saveBitmapToJpegFile(bitmap, tempJpeg);
-		uploadImage(tempJpeg, listener);
+		String fileName = EXTERNAL_STORAGE_DIRECTORY + System.currentTimeMillis() + FILE_TYPE_STR;
+		saveBitmapToJpegFile(bitmap, fileName);
+		uploadImage(fileName, listener);
 	}
 
 	public void uploadImage(Bitmap bitmap, String imgUrl, IQiniuUploadUitlsListener listener) {
-
 		saveBitmapToJpegFile(bitmap, imgUrl);
 		uploadImage(imgUrl, listener);
 	}

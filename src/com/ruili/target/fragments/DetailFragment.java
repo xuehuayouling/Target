@@ -15,6 +15,7 @@ import com.ruili.target.entity.Subcategory;
 import com.ruili.target.entity.SubcategoryListDTO;
 import com.ruili.target.utils.Constant;
 import com.ruili.target.utils.JsonUtil;
+import com.ruili.target.utils.Logger;
 
 import android.app.ListFragment;
 import android.content.Intent;
@@ -83,6 +84,7 @@ public class DetailFragment extends ListFragment {
 
 					@Override
 					public void onResponse(String response) {
+						Logger.debug(TAG, "reloadData success -->   " + response);
 						mActivity.getProgressDialogUtils().cancel();
 						decodeResponse(response);
 					}
@@ -90,6 +92,7 @@ public class DetailFragment extends ListFragment {
 
 					@Override
 					public void onErrorResponse(VolleyError error) {
+						Logger.debug(TAG, "reloadData fail -->   " + error.toString());
 						mActivity.getProgressDialogUtils().cancel();
 						mActivity.getToast().show(R.string.netword_fail);
 					}
@@ -122,6 +125,7 @@ public class DetailFragment extends ListFragment {
 		}
 		String url = Constant.BASE_URL + String.format("/api/v1/index/%d/%d/%s/%s/small_indexs",
 				mCategoryId, mActivity.getUserOperatorID(), checktime, mDate);
+		Logger.debug(TAG, "getSubCategoryUrl -->  " + url);
 		return url;
 	}
 
