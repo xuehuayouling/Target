@@ -29,7 +29,7 @@ public class DetailFragment extends ListFragment {
 	private TargetListActivity mActivity;
 	private DetailsFragmentAdapter mAdapter;
 	private static final String TAG = DetailFragment.class.getSimpleName();
-	private int mCategoryId;
+	private int mCategoryId = -1;
 	private int mCheckTimeId = CheckTime.CHECK_TIME_NULL;
 	private String mDate;
 	public void setActivity(TargetListActivity activity) {
@@ -68,6 +68,14 @@ public class DetailFragment extends ListFragment {
 		reloadData();
 	}
 	
+	@Override
+	public void onResume() {
+		super.onResume();
+		if (mCategoryId != -1) {
+			reloadData();
+		}
+	}
+
 	private void reloadData() {
 		mActivity.getProgressDialogUtils().show("");
 		StringRequest stringRequest = new StringRequest(Method.GET, getSubCategoryUrl(),

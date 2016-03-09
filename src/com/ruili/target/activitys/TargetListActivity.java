@@ -208,7 +208,7 @@ public class TargetListActivity extends BaseActivity implements OnClickListener 
 					@Override
 					public void onResponse(String response) {
 						mProgressDialogUtils.cancel();
-						mToast.show(response);
+//						mToast.show(response);
 						mMainFragment.updateData();
 					}
 				}, new Response.ErrorListener() {

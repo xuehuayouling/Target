@@ -45,6 +45,7 @@ import android.widget.ImageView;
 import android.widget.RadioGroup;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.RadioGroup.OnCheckedChangeListener;
 
 public class TargetDetailsActivity extends BaseActivity implements OnClickListener {
 	public static final String KEY_SUBCATEGORY = "subcategory";
@@ -146,6 +147,22 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 				} else {
 					mRGState.clearCheck();
 				}
+				mRGState.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+					
+					@Override
+					public void onCheckedChanged(RadioGroup group, int checkedId) {
+						switch (checkedId) {
+						case R.id.rbtn_yes:
+							mSubcategory.setIndex_complete(Subcategory.INDEX_COMPLETE_YES);
+							break;
+						case R.id.rbtn_no:
+							mSubcategory.setIndex_complete(Subcategory.INDEX_COMPLETE_NO);
+							break;
+						default:
+							break;
+						}
+					}
+				});
 			}
 			mETRemark.setText(mSubcategory.getIndex_remark());
 			final List<PicUrl> picUrls = mSubcategory.getIndex_pic();
@@ -204,7 +221,9 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 	}
 	
 	private void save() {
-		mSubcategory.setIndex_score(String.valueOf((int) mRBarScore.getRating()));
+		if (mSubcategory.getIndex_type() == Subcategory.INDEX_TYPE_SCORE) {
+			mSubcategory.setIndex_score(String.valueOf((int) mRBarScore.getRating()));
+		}
 		mSubcategory.setIndex_remark(mETRemark.getText().toString());
 		getProgressDialogUtils().show();
 		StringRequest stringRequest = new StringRequest(Method.PUT, getUpdateSubCategoryUrl(mSubcategory.getIndex_log_id()),
@@ -213,13 +232,14 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 					@Override
 					public void onResponse(String response) {
 						getProgressDialogUtils().cancel();
+						Logger.debug(TAG, "save success -->  " + response);
 						finish();
 					}
 				}, new Response.ErrorListener() {
 
 					@Override
 					public void onErrorResponse(VolleyError error) {
-						Logger.debug(TAG , error.toString());
+						Logger.debug(TAG, "save fail -->  " + error.toString());
 						getProgressDialogUtils().cancel();
 						getToast().show(R.string.netword_fail);
 					}
@@ -227,12 +247,7 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 
 					@Override
 					protected Map<String, String> getParams() throws AuthFailureError {
-						Map<String, String> map = new HashMap<String, String>();
-						map.put("index_complete", String.valueOf(mSubcategory.getIndexComplete()));
-						map.put("index_score", String.valueOf(mSubcategory.getIndex_score()));
-						map.put("index_remark", String.valueOf(mSubcategory.getIndex_remark()));
-						map.put("index_pic", String.valueOf(mSubcategory.getIndexPics()));
-						return map;
+						return mSubcategory.getUpdataParams(TAG);
 					}
 			
 		};

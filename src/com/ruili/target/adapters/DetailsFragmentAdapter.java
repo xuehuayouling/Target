@@ -12,7 +12,6 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.ruili.target.R;
 import com.ruili.target.activitys.TargetListActivity;
-import com.ruili.target.entity.PicUrl;
 import com.ruili.target.entity.Subcategory;
 import com.ruili.target.utils.Constant;
 import com.ruili.target.utils.Logger;
@@ -164,12 +163,7 @@ public class DetailsFragmentAdapter extends BaseAdapter {
 
 					@Override
 					protected Map<String, String> getParams() throws AuthFailureError {
-						Map<String, String> map = new HashMap<String, String>();
-						map.put("index_complete",  String.valueOf(subcategory.getIndexComplete()));
-						map.put("index_score", String.valueOf(subcategory.getIndex_score()));
-						map.put("index_remark", String.valueOf(subcategory.getIndex_remark()));
-						map.put("index_pic", String.valueOf(subcategory.getIndexPics()));
-						return map;
+						return subcategory.getUpdataParams(TAG);
 					}
 			
 		};

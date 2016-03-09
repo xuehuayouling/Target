@@ -1,9 +1,12 @@
 package com.ruili.target.entity;
 
-import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.ruili.target.R;
+import com.ruili.target.utils.JsonUtil;
+import com.ruili.target.utils.Logger;
 
 public class Subcategory {
 	public static final int INDEX_TYPE_YESNO = 0;
@@ -90,11 +93,13 @@ public class Subcategory {
 		return index_complete;
 	}
 
-	public String getIndexComplete() {
-		if (index_complete == -1) {
-			return null;
+	private String getIndexComplete() {
+		if (index_complete == INDEX_COMPLETE_YES) {
+			return "1";
+		} else if (index_complete == INDEX_COMPLETE_NO) {
+			return "0";
 		} else {
-			return String.valueOf(index_complete);
+			return null;
 		}
 	}
 	public void setIndex_complete(int index_complete) {
@@ -133,6 +138,20 @@ public class Subcategory {
 			break;
 		}
 		return id;
+	}
+	
+	public Map<String, String> getUpdataParams(String tag) {
+		Logger.debug(tag, "subcategory -->  " + JsonUtil.toJSONString(this));
+		Map<String, String> map = new HashMap<String, String>();
+		if (index_type == INDEX_TYPE_YESNO && (getIndex_complete() == INDEX_COMPLETE_YES || getIndex_complete() == INDEX_COMPLETE_NO)) {
+			map.put("index_complete", getIndexComplete());
+		}
+		if (index_type == INDEX_TYPE_SCORE) {
+			map.put("index_score", String.valueOf(getIndex_score()));
+		}
+		map.put("index_remark", String.valueOf(getIndex_remark()));
+		map.put("index_pic", String.valueOf(getIndexPics()));
+		return map;
 	}
 
 }
