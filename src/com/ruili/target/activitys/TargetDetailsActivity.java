@@ -1,5 +1,9 @@
 package com.ruili.target.activitys;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -25,12 +29,11 @@ import com.ruili.target.utils.QiniuUploadUitls;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -51,7 +54,7 @@ import android.widget.TextView;
 public class TargetDetailsActivity extends BaseActivity implements OnClickListener {
 	public static final String KEY_SUBCATEGORY = "subcategory";
 	private static final int REQUEST_CODE_IMAGE_CAPTURE = 300;
-	private Uri photoUri;
+	private String photoUriPath;
 	private Subcategory mSubcategory;
 	private TextView mTVTitle;
 	private RadioGroup mRGState;
@@ -111,6 +114,7 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 						mImageAdapter.getItem(position);
 						mPicPaths.remove(position);
 						mImageAdapter.setPicPaths(mPicPaths);
+						Logger.debug(TAG, "remove one pic -->  mPicPaths.size()" + mPicPaths.size());
 					}
 				}).create();
 				dialog.show();
@@ -229,7 +233,7 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 				for (PicUrl picUrl : picUrls) {
 					mPicPaths.add(picUrl.getPic_url());
 					mImageAdapter.setPicPaths(mPicPaths);
-
+					Logger.debug(TAG, "add one pic -->  mPicPaths.size()" + mPicPaths.size());
 				}
 			}
 		}
@@ -244,21 +248,18 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.imgv_take_photo:
-			ContentValues values = new ContentValues();
-			photoUri = null;
-			while (photoUri == null) {
-				photoUri = this.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
-			}
+			photoUriPath = Constant.BASE_IMAGE_CAPTURE_PATH + System.currentTimeMillis() + Constant.PIC_END_STR;
+			Uri uri = Uri.fromFile(new File(photoUriPath));
 			Intent intent = new Intent();
 			intent.setAction(MediaStore.ACTION_IMAGE_CAPTURE);
-			intent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
+			intent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
 			startActivityForResult(intent, REQUEST_CODE_IMAGE_CAPTURE);
 			break;
 		case R.id.iv_back:
 			finish();
 			break;
 		case R.id.tv_save:
-			uploadImage();
+			startSaveSubcategory();
 			break;
 		default:
 			break;
@@ -267,12 +268,23 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 
 	private List<String> mNeedUploadPicPaths;
 
-	private void uploadImage() {
+	private void startSaveSubcategory() {
+		mSubcategory.setIndex_pic(null);
+		Logger.debug(TAG, "uploadImage -->  mPicPaths.size()" + mPicPaths.size());
 		if (mPicPaths.size() > 0) {
 			mNeedUploadPicPaths = new ArrayList<>();
 			for (String path : mPicPaths) {
-				if (path.startsWith(Constant.CAMERA_FILE_PATH)) {
+				if (path.startsWith(Constant.BASE_IMAGE_CAPTURE_PATH)) {
 					mNeedUploadPicPaths.add(path);
+				} else {
+					List<PicUrl> picUrls = mSubcategory.getIndex_pic();
+					if (picUrls == null) {
+						picUrls = new ArrayList<>();
+					}
+					PicUrl picUrl = new PicUrl();
+					picUrl.setPic_url(path);
+					picUrls.add(picUrl);
+					mSubcategory.setIndex_pic(picUrls);
 				}
 			}
 			uploadImage(0);
@@ -365,22 +377,8 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == REQUEST_CODE_IMAGE_CAPTURE) {
 			if (resultCode == RESULT_OK) {
-				String[] pojo = { MediaStore.Images.Media.DATA };
-				Logger.debug(TAG, "photoUri:" + photoUri);
-				if (photoUri == null) {
-					return;
-				}
-				Cursor cursor = getContentResolver().query(photoUri, pojo, null, null, null);
-				if (cursor != null) {
-					int columnIndex = cursor.getColumnIndexOrThrow(pojo[0]);
-					if (cursor.moveToFirst()) {
-						String picPath = cursor.getString(columnIndex);
-						Logger.debug(TAG, "picPath:" + picPath);
-						mPicPaths.add(picPath);
-						mImageAdapter.setPicPaths(mPicPaths);
-					}
-					cursor.close();
-				}
+				mPicPaths.add(photoUriPath);
+				mImageAdapter.setPicPaths(mPicPaths);
 			}
 		}
 	}

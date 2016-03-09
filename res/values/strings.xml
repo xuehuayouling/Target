@@ -24,6 +24,7 @@
     <string name="save">保存</string>
     <string name="delete">删除</string>
     <string name="delete_confirm">是否删除？</string>
+    <string name="capture_image_fail">拍照失败，请重试</string>
     
     <string name="app_picker_name">Applications</string>
     <string name="bookmark_picker_name">Bookmarks</string>

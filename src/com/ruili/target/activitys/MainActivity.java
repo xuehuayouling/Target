@@ -6,6 +6,7 @@ import com.ruili.target.entity.User;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -86,7 +87,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 			showTargetListActivity(TargetListActivity.TYPE_INSPECT_SUPERVISE);
 			break;
 		case R.id.imgbtn_settings:
-			optionPopupWindow();
+			showOrHideTimeMenus();
 			break;
 		default:
 			break;
@@ -99,24 +100,40 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 		startActivity(intent);
 	}
 
-	private void optionPopupWindow() {
+	private void showOrHideTimeMenus() {
+		if (mPopupWindow != null && mPopupWindow.isShowing()) {
+			dismissTimeMenus();
+		} else {
+			showTimeMenus();
+		}
+	}
+
+	private void dismissTimeMenus() {
+		if (mPopupWindow != null && mPopupWindow.isShowing()) {
+			mPopupWindow.dismiss();
+		}
+	}
+
+	private void showTimeMenus() {
 		if (mPopupWindow == null) {
 			View view = LayoutInflater.from(this).inflate(R.layout.widget_quit, null);
 			view.setOnClickListener(new OnClickListener() {
 
 				@Override
 				public void onClick(View arg0) {
+					dismissTimeMenus();
 					clearUserInfo();
 					showLoginActivity();
 				}
 			});
 			mPopupWindow = new PopupWindow(view, LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-			mPopupWindow.showAsDropDown(findViewById(R.id.imgbtn_settings), 10, 10);
+			mPopupWindow.setBackgroundDrawable(new BitmapDrawable());
 			mPopupWindow.setFocusable(true);
+			mPopupWindow.setOutsideTouchable(true);
 			mPopupWindow.update();
+			mPopupWindow.showAsDropDown(findViewById(R.id.imgbtn_settings), 10, 10);
 		} else {
-			mPopupWindow.dismiss();
-			mPopupWindow = null;
+			mPopupWindow.showAsDropDown(findViewById(R.id.imgbtn_settings), 10, 10);
 		}
 	}
 }

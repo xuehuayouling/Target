@@ -101,7 +101,7 @@ public class ImageAdapter extends BaseAdapter {
 		if (TextUtil.isEmpty(picPath)) {
 			return null;
 		}
-		return ImageTool.compressBitmap(picPath, 200, 150);
+		return ImageTool.compressBitmap(picPath, 400, 300);
 	}
 
 	class ViewHolder {

@@ -1,14 +1,20 @@
 package com.ruili.target.utils;
 
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.graphics.Bitmap.CompressFormat;
 
 public class ImageTool {
 
+	private static final int maxWidth = 768;
+	private static final int maxHeight = 1024;
+	
 	public ImageTool() {
 		super();
 	}
@@ -139,4 +145,44 @@ public class ImageTool {
 		return compressImage(bitmap);// 压缩好比例大小后再进行质量压缩
 	}
 
+	public static boolean saveBitmapToJpegFile(Bitmap bitmap, String path) {
+		try {
+			BufferedOutputStream bufOutStr = new BufferedOutputStream(new FileOutputStream(path));
+			resizeBitmap(bitmap).compress(CompressFormat.JPEG, 100, bufOutStr);
+			bufOutStr.flush();
+			bufOutStr.close();
+		} catch (Exception exception) {
+			return false;
+		}
+		return true;
+		
+	}
+	
+	/**
+	 * 缩小图片
+	 * 
+	 * @param bitmap
+	 * @return
+	 */
+	public static Bitmap resizeBitmap(Bitmap bitmap) {
+		if (bitmap != null) {
+			int width = bitmap.getWidth();
+			int height = bitmap.getHeight();
+			if (width > maxWidth) {
+				int pWidth = maxWidth;
+				int pHeight = maxWidth * height / width;
+				Bitmap result = Bitmap.createScaledBitmap(bitmap, pWidth, pHeight, false);
+				bitmap.recycle();
+				return result;
+			}
+			if (height > maxHeight) {
+				int pHeight = maxHeight;
+				int pWidth = maxHeight * width / height;
+				Bitmap result = Bitmap.createScaledBitmap(bitmap, pWidth, pHeight, false);
+				bitmap.recycle();
+				return result;
+			}
+		}
+		return bitmap;
+	}
 }
