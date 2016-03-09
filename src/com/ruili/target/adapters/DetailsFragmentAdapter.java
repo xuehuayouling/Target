@@ -1,7 +1,6 @@
 package com.ruili.target.adapters;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -13,10 +12,13 @@ import com.android.volley.toolbox.StringRequest;
 import com.ruili.target.R;
 import com.ruili.target.activitys.TargetListActivity;
 import com.ruili.target.entity.Subcategory;
+import com.ruili.target.entity.SubcategoryDTO;
 import com.ruili.target.utils.Constant;
+import com.ruili.target.utils.JsonUtil;
 import com.ruili.target.utils.Logger;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -86,6 +88,7 @@ public class DetailsFragmentAdapter extends BaseAdapter {
 		}
 		ViewHolder holder = (ViewHolder) view.getTag();
 		holder.viewState.setBackgroundResource(subcategory.getStateResourceID());
+		final View viewState = holder.viewState;
 		holder.tvTitle.setText(subcategory.getSmall_index_name());
 		if (Subcategory.INDEX_TYPE_YESNO == subcategory.getIndex_type()) {
 			holder.llScore.setVisibility(View.GONE);
@@ -111,7 +114,7 @@ public class DetailsFragmentAdapter extends BaseAdapter {
 					default:
 						break;
 					}
-					updateSubcategory(subcategory);
+					updateSubcategory(subcategory, viewState);
 				}
 			});
 		} else if (Subcategory.INDEX_TYPE_SCORE == subcategory.getIndex_type()) {
@@ -130,7 +133,7 @@ public class DetailsFragmentAdapter extends BaseAdapter {
 				public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
 					if (fromUser) {
 						subcategory.setIndex_score(String.valueOf((int)rating));
-						updateSubcategory(subcategory);
+						updateSubcategory(subcategory, viewState);
 					}
 				}
 			});
@@ -141,7 +144,7 @@ public class DetailsFragmentAdapter extends BaseAdapter {
 		return view;
 	}
 
-	private void updateSubcategory(final Subcategory subcategory) {
+	private void updateSubcategory(final Subcategory subcategory, final View view) {
 		mActivity.getProgressDialogUtils().show();
 		StringRequest stringRequest = new StringRequest(Method.PUT, getUpdateSubCategoryUrl(subcategory.getIndex_log_id()),
 				new Response.Listener<String>() {
@@ -150,6 +153,8 @@ public class DetailsFragmentAdapter extends BaseAdapter {
 					public void onResponse(String response) {
 						Logger.debug(TAG, "updateSubcategory success -->   " + response);
 						mActivity.getProgressDialogUtils().cancel();
+						decodeResponse(response, view);
+						
 					}
 				}, new Response.ErrorListener() {
 
@@ -170,6 +175,21 @@ public class DetailsFragmentAdapter extends BaseAdapter {
 		mActivity.getRequestQueue().add(stringRequest);
 	}
 	
+	private void decodeResponse(String response, View view) {
+		Log.d(TAG, response);
+		try {
+			SubcategoryDTO dto = JsonUtil.parseObject(response, SubcategoryDTO.class);
+			if (dto.isValid()) {
+				Subcategory subcategory = dto.getData();
+				view.setBackgroundResource(subcategory.getStateResourceID());
+			} else {
+				mActivity.getToast().show(mActivity.getString(R.string.get_data_fail) + response);
+			}
+		} catch (Exception e) {
+			mActivity.getToast().show(mActivity.getResources().getText(R.string.service_fail) + response);
+			e.printStackTrace();
+		}
+	}
 	private String getUpdateSubCategoryUrl(int indexLogId) {
 		return Constant.BASE_URL + String.format("/api/v1/index/%d/index_log", indexLogId);
 	}
