@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -21,11 +22,14 @@ import com.ruili.target.entity.PicUrl;
 import com.ruili.target.entity.Subcategory;
 import com.ruili.target.entity.SubcategoryDTO;
 import com.ruili.target.utils.Constant;
+import com.ruili.target.utils.IQiniuUploadManagerListener;
 import com.ruili.target.utils.IQiniuUploadUitlsListener;
 import com.ruili.target.utils.ImageTool;
 import com.ruili.target.utils.JsonUtil;
 import com.ruili.target.utils.Logger;
+import com.ruili.target.utils.QiniuUploadManager;
 import com.ruili.target.utils.QiniuUploadUitls;
+import com.ruili.target.utils.TextUtil;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -287,7 +291,38 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 					mSubcategory.setIndex_pic(picUrls);
 				}
 			}
-			uploadImage(0);
+			final List<Map<String, String>> files = new ArrayList<>();
+			for (String path : mNeedUploadPicPaths) {
+				Map<String, String> map = new HashMap<>();
+				map.put(QiniuUploadManager.KEY_FILE_PATH, path);
+				map.put(QiniuUploadManager.KEY_SAVE_NAME, path.replace(Constant.BASE_IMAGE_CAPTURE_PATH, ""));
+				files.add(map);
+			}
+			QiniuUploadManager manager = new QiniuUploadManager();
+			getProgressDialogUtils().show();
+			manager.multipleUpload(files, new IQiniuUploadManagerListener() {
+				
+				@Override
+				public void onMultipleUploadFail(String reason) {
+					getProgressDialogUtils().cancel();
+					getToast().show(getString(R.string.netword_fail) + reason);
+				}
+				
+				@Override
+				public void onMultipleUploadDone() {
+					List<PicUrl> picUrls = mSubcategory.getIndex_pic();
+					if (picUrls == null) {
+						picUrls = new ArrayList<>();
+					}
+					for (Map<String, String> map : files) {
+						PicUrl picUrl = new PicUrl();
+						picUrl.setPic_url(QiniuUploadManager.getFileHttpUrlByName(map.get(QiniuUploadManager.KEY_SAVE_NAME)));
+						picUrls.add(picUrl);
+					}
+					mSubcategory.setIndex_pic(picUrls);
+					save();
+				}
+			});
 		} else {
 			save();
 		}
@@ -298,7 +333,6 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 			mSubcategory.setIndex_score(String.valueOf((int) mRBarScore.getRating()));
 		}
 		mSubcategory.setIndex_remark(mETRemark.getText().toString());
-		getProgressDialogUtils().show();
 		StringRequest stringRequest = new StringRequest(Method.PUT,
 				getUpdateSubCategoryUrl(mSubcategory.getIndex_log_id()), new Response.Listener<String>() {
 
@@ -377,8 +411,12 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == REQUEST_CODE_IMAGE_CAPTURE) {
 			if (resultCode == RESULT_OK) {
-				mPicPaths.add(photoUriPath);
-				mImageAdapter.setPicPaths(mPicPaths);
+				if (!TextUtil.isEmpty(photoUriPath)) {
+					mPicPaths.add(photoUriPath);
+					mImageAdapter.setPicPaths(mPicPaths);
+				} else {
+					getToast().show(R.string.capture_image_fail);
+				}
 			}
 		}
 	}
