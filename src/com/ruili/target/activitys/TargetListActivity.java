@@ -1,10 +1,8 @@
 package com.ruili.target.activitys;
 
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 import com.android.volley.Request.Method;
 import com.android.volley.RequestQueue;
@@ -18,11 +16,10 @@ import com.ruili.target.entity.Category;
 import com.ruili.target.entity.CheckTime;
 import com.ruili.target.entity.Employee;
 import com.ruili.target.entity.EmployeeListDTO;
-import com.ruili.target.entity.Subcategory;
-import com.ruili.target.entity.SubcategoryListDTO;
 import com.ruili.target.fragments.DetailFragment;
 import com.ruili.target.fragments.MainFragment;
 import com.ruili.target.utils.Constant;
+import com.ruili.target.utils.DateUtils;
 import com.ruili.target.utils.JsonUtil;
 import com.ruili.target.utils.Logger;
 
@@ -45,9 +42,10 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.SearchView;
+import android.widget.SearchView.OnQueryTextListener;
 import android.widget.TextView;
 
-public class TargetListActivity extends BaseActivity implements OnClickListener {
+public class TargetListActivity extends BaseActivity implements OnClickListener, OnQueryTextListener {
 
 	public static final String TYPE_KEY = "type";
 	public static final int TYPE_TODAY = 0;
@@ -62,6 +60,9 @@ public class TargetListActivity extends BaseActivity implements OnClickListener 
 	private int mType;
 	private TextView mTVDate;
 	private TextView mTVEmployee;
+	
+	private int mOperatorID = -1;
+	private boolean firstResume = true;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -89,7 +90,8 @@ public class TargetListActivity extends BaseActivity implements OnClickListener 
 		ivMenu.setOnClickListener(this);
 		mTVEmployee.setOnClickListener(this);
 		mTVDate.setOnClickListener(this);
-		svSearch.setOnClickListener(this);
+		svSearch.setOnQueryTextListener(this);
+		svSearch.setVisibility(View.GONE);
 		tvScan.setOnClickListener(this);
 		switch (mType) {
 		case TYPE_TODAY:
@@ -104,6 +106,17 @@ public class TargetListActivity extends BaseActivity implements OnClickListener 
 			break;
 		default:
 			break;
+		}
+	}
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
+		// 第一次进入今日指标的话直接加载数据
+		if (mType == TYPE_TODAY && firstResume) {
+			firstResume = false;
+			mOperatorID = getUserOperatorID();
+			updateMainFragment();
 		}
 	}
 
@@ -137,7 +150,6 @@ public class TargetListActivity extends BaseActivity implements OnClickListener 
 			break;
 		case R.id.tv_scan:
 			// showCaptureActivity();
-			updateMainFragment(getUserOperatorID());
 			break;
 		case R.id.iv_menu:
 			showOrHideTimeMenus();
@@ -155,17 +167,21 @@ public class TargetListActivity extends BaseActivity implements OnClickListener 
 	
 	
 	private String getDateString(Date date) {
-		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-		String data = format.format(date);
-		return data;
+		return DateUtils.getDateString(date);
 	}
 	
 	private void showDatePickerDialog() {
 		Calendar c = Calendar.getInstance();
 		DatePickerDialog dialog = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
+			
 			public void onDateSet(DatePicker dp, int year, int month, int dayOfMonth) {
-				mTVDate.setText(getDateString(new Date(year - 1900, month, dayOfMonth)));
-				mDetailFragment.setDate(mTVDate.getText().toString());
+				final String newDate = getDateString(new Date(year - 1900, month, dayOfMonth));
+				if (!mTVDate.getText().equals(newDate)) {
+					mTVDate.setText(newDate);
+					if (mType == TYPE_INSPECT_SUPERVISE) {
+						updateMainFragment();
+					}
+				}
 			}
 			
 		}, c.get(Calendar.YEAR), // 传入年份
@@ -314,7 +330,8 @@ public class TargetListActivity extends BaseActivity implements OnClickListener 
 
 					@Override
 					public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-						updateMainFragment(mEmployeeMenuAdapter.getItem(position).getOperator_id());
+						mOperatorID = mEmployeeMenuAdapter.getItem(position).getOperator_id();
+						updateMainFragment();
 						mTVEmployee.setText(mEmployeeMenuAdapter.getItem(position).getName());
 						dismissEmployeeMenus();
 					}
@@ -333,6 +350,10 @@ public class TargetListActivity extends BaseActivity implements OnClickListener 
 		}
 	}
 
+	public int getOperatorId() {
+		return mOperatorID;
+	}
+	
 	private void showCaptureActivity() {
 		Intent intent = new Intent(this, CaptureActivity.class);
 		startActivityForResult(intent, SCAN_REQUEST_CODE);
@@ -355,7 +376,8 @@ public class TargetListActivity extends BaseActivity implements OnClickListener 
 					public void onResponse(String response) {
 						Logger.debug(TAG, "decodeBarcode success -->  " + response);
 						mProgressDialogUtils.cancel();
-						updateMainFragment(getUserOperatorID());
+						mOperatorID = getUserOperatorID();
+						updateMainFragment();
 					}
 				}, new Response.ErrorListener() {
 
@@ -373,9 +395,21 @@ public class TargetListActivity extends BaseActivity implements OnClickListener 
 		return Constant.BASE_URL + String.format("/api/v1/index/%d/%s", getUserOperatorID(), barcode);
 	}
 
-	private void updateMainFragment(int operatorID) {
+	private void updateMainFragment() {
 		mDetailFragment.clear();
-		mMainFragment.updateData(operatorID);
+		mMainFragment.setParams(mTVDate.getText().toString(), mOperatorID);
+	}
+	
+	@Override
+	public boolean onQueryTextSubmit(String query) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean onQueryTextChange(String newText) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 }

@@ -4,8 +4,8 @@ import android.os.Environment;
 
 public class Constant {
 
-//	public static final String BASE_URL = "http://wqjms4gkkh.proxy.qqbrowser.cc/ruiliqc";
-	public static final String BASE_URL = "http://121.40.224.107/ruiliqc";
+	public static final String BASE_URL = "http://wqjms4gkkh.proxy.qqbrowser.cc/ruiliqc";
+//	public static final String BASE_URL = "http://121.40.224.107/ruiliqc";
 	public static final String USER_LOGIN = BASE_URL + "/api/v1/user/login";
 	public static final String SonSDCardD = "/storage/emulated/0/DCIM/Camera/";
 	public static final String CAMERA_FILE_PATH = "/storage/emulated/0/DCIM/Camera/";

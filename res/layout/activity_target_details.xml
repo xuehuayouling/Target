@@ -126,57 +126,113 @@
         </LinearLayout>
     </LinearLayout>
 
-    <View
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@android:color/transparent" />
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center" >
+
+        <EditText
+            android:id="@+id/et_remark"
+            android:layout_width="892dp"
+            android:layout_height="192dp"
+            android:background="@drawable/selector_et"
+            android:gravity="start|top"
+            android:inputType="text"
+            tools:ignore="LabelFor" />
+
+        <TextView
+            android:id="@+id/tv_remark"
+            android:layout_width="892dp"
+            android:layout_height="192dp"
+            android:maxLines="5"
+            android:visibility="gone"
+            tools:ignore="LabelFor" />
+    </RelativeLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical" >
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal"
+        android:padding="20dp" >
+
+        <Gallery
+            android:id="@+id/ll_pics"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/details_proof_photo_height"
+            android:layout_weight="1"
+            android:spacing="20dp" >
+        </Gallery>
+
+        <ImageView
+            android:id="@+id/imgv_take_photo"
+            android:layout_width="@dimen/details_proof_photo_height"
+            android:layout_height="@dimen/details_proof_photo_height"
+            android:layout_marginEnd="10dp"
+            android:layout_marginStart="10dp"
+            android:background="@drawable/ic_take_photo"
+            android:scaleType="centerInside"
+            tools:ignore="ContentDescription" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal"
+        android:baselineAligned="false"
+        android:padding="20dp" >
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical" >
+
+            <Button
+                android:id="@+id/btn_satisfaction_good"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_margin="2dp"
+                android:layout_weight="1"
+                android:background="@android:color/darker_gray"
+                android:text="@string/satisfaction_good" />
+
+            <Button
+                android:id="@+id/btn_satisfaction_normal"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_margin="2dp"
+                android:layout_weight="1"
+                android:background="@android:color/darker_gray"
+                android:text="@string/satisfaction_normal" />
+
+            <Button
+                android:id="@+id/btn_satisfaction_bad"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_margin="2dp"
+                android:layout_weight="1"
+                android:background="@android:color/darker_gray"
+                android:text="@string/satisfaction_bad" />
+        </LinearLayout>
 
         <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="4"
             android:gravity="center" >
 
             <EditText
-                android:id="@+id/et_remark"
-                android:layout_width="892dp"
-                android:layout_height="192dp"
+                android:id="@+id/et_comment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:background="@drawable/selector_et"
                 android:gravity="start|top"
                 android:inputType="text"
                 tools:ignore="LabelFor" />
         </RelativeLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:orientation="horizontal"
-            android:padding="20dp" >
-
-            <Gallery
-                android:id="@+id/ll_pics"
-                android:layout_width="0dp"
-                android:layout_height="@dimen/details_proof_photo_height"
-                android:layout_weight="1"
-                android:spacing="20dp" >
-            </Gallery>
-
-            <ImageView
-                android:id="@+id/imgv_take_photo"
-                android:layout_width="@dimen/details_proof_photo_height"
-                android:layout_height="@dimen/details_proof_photo_height"
-                android:layout_marginEnd="10dp"
-                android:layout_marginStart="10dp"
-                android:scaleType="centerInside"
-                android:background="@drawable/ic_take_photo"
-                tools:ignore="ContentDescription" />
-        </LinearLayout>
     </LinearLayout>
 
 </LinearLayout>

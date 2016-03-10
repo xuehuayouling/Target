@@ -25,6 +25,24 @@ public class Subcategory {
 	private String status;
 	private String index_remark;
 	private List<PicUrl> index_pic;
+	private String qc_state;
+	private String qc_describe;
+
+	public String getQc_state() {
+		return qc_state;
+	}
+
+	public void setQc_state(String qc_state) {
+		this.qc_state = qc_state;
+	}
+
+	public String getQc_describe() {
+		return qc_describe;
+	}
+
+	public void setQc_describe(String qc_describe) {
+		this.qc_describe = qc_describe;
+	}
 
 	public List<PicUrl> getIndex_pic() {
 		return index_pic;

@@ -47,6 +47,7 @@ public class DetailFragment extends ListFragment {
 		Intent intent = new Intent(getActivity(), TargetDetailsActivity.class);
 		final Subcategory subcategory = (Subcategory) mAdapter.getItem(position);
 		intent.putExtra(TargetDetailsActivity.KEY_SUBCATEGORY, subcategory.getIndex_log_id());
+		intent.putExtra(TargetDetailsActivity.KEY_TYPE, mActivity.getType());
 		startActivity(intent);
 	}
 
@@ -119,20 +120,27 @@ public class DetailFragment extends ListFragment {
 				List<Subcategory> subcategories = dto.getData();
 				mAdapter.setSubcategories(subcategories);
 			} else {
+				mAdapter.setSubcategories(null);
 				mActivity.getToast().show(mActivity.getString(R.string.get_data_fail) + response);
 			}
 		} catch (Exception e) {
+			mAdapter.setSubcategories(null);
 			mActivity.getToast().show(mActivity.getResources().getText(R.string.service_fail) + response);
 			e.printStackTrace();
 		}
 	}
+	
 	private String getSubCategoryUrl() {
 		String checktime = String.valueOf(mCheckTimeId);
 		if (CheckTime.CHECK_TIME_NULL == mCheckTimeId) {
 			checktime = null;
 		}
+		int operatoryId = mActivity.getUserOperatorID();
+		if (mActivity.getType() == TargetListActivity.TYPE_INSPECT_SUPERVISE) {
+			operatoryId = mActivity.getOperatorId();
+		}
 		String url = Constant.BASE_URL + String.format("/api/v1/index/%d/%d/%s/%s/small_indexs",
-				mCategoryId, mActivity.getUserOperatorID(), checktime, mDate);
+				mCategoryId, operatoryId, checktime, mDate);
 		Logger.debug(TAG, "getSubCategoryUrl -->  " + url);
 		return url;
 	}

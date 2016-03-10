@@ -1,9 +1,6 @@
 package com.ruili.target.activitys;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,12 +20,10 @@ import com.ruili.target.entity.Subcategory;
 import com.ruili.target.entity.SubcategoryDTO;
 import com.ruili.target.utils.Constant;
 import com.ruili.target.utils.IQiniuUploadManagerListener;
-import com.ruili.target.utils.IQiniuUploadUitlsListener;
 import com.ruili.target.utils.ImageTool;
 import com.ruili.target.utils.JsonUtil;
 import com.ruili.target.utils.Logger;
 import com.ruili.target.utils.QiniuUploadManager;
-import com.ruili.target.utils.QiniuUploadUitls;
 import com.ruili.target.utils.TextUtil;
 
 import android.app.AlertDialog;
@@ -37,7 +32,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -47,6 +41,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Gallery;
 import android.widget.ImageView;
@@ -57,6 +52,7 @@ import android.widget.TextView;
 
 public class TargetDetailsActivity extends BaseActivity implements OnClickListener {
 	public static final String KEY_SUBCATEGORY = "subcategory";
+	public static final String KEY_TYPE = "type";
 	private static final int REQUEST_CODE_IMAGE_CAPTURE = 300;
 	private String photoUriPath;
 	private Subcategory mSubcategory;
@@ -64,12 +60,22 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 	private RadioGroup mRGState;
 	private RatingBar mRBarScore;
 	private EditText mETRemark;
+	private TextView mTVRemark;
+	private EditText mETComment;
 	private Gallery mGlpics;
 	private LayoutInflater mInflater;
 	private ImageAdapter mImageAdapter;
 	private List<String> mPicPaths = new ArrayList<>();
 	protected static final String TAG = TargetDetailsActivity.class.getSimpleName();
 	private RequestQueue mQueue;
+	// 今日指标、历史指标、监督管理
+	private int mType;
+	
+	private static final int SATISFACTION_GOOD = 0;
+	private static final int SATISFACTION_NORMAL = 1;
+	private static final int SATISFACTION_BAD = 2;
+	private int mSatisfaction = -1;
+	private List<String> mNeedUploadPicPaths;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +83,11 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 		setContentView(R.layout.activity_target_details);
 		initRequestQueue();
 		mInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		initView();
+	}
+
+	private void initView() {
+		mType = getIntent().getIntExtra(KEY_TYPE, -1);
 		ImageView imgVTakePhoto = (ImageView) findViewById(R.id.imgv_take_photo);
 		imgVTakePhoto.setOnClickListener(this);
 		TextView tvSave = (TextView) findViewById(R.id.tv_save);
@@ -85,6 +96,7 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 		mRGState = (RadioGroup) findViewById(R.id.rg_state);
 		mRBarScore = (RatingBar) findViewById(R.id.rbar_score);
 		mETRemark = (EditText) findViewById(R.id.et_remark);
+		mTVRemark = (TextView) findViewById(R.id.tv_remark);
 		ImageView ivBack = (ImageView) findViewById(R.id.iv_back);
 		ivBack.setOnClickListener(this);
 		mGlpics = (Gallery) findViewById(R.id.ll_pics);
@@ -103,28 +115,49 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 
 			@Override
 			public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
-				Dialog dialog = new AlertDialog.Builder(TargetDetailsActivity.this).setTitle(R.string.delete_confirm)
-						.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+				if (mType == TargetListActivity.TYPE_INSPECT_SUPERVISE) {
+					return false;
+				} else {
+					Dialog dialog = new AlertDialog.Builder(TargetDetailsActivity.this)
+							.setTitle(R.string.delete_confirm)
+							.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
 
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						// TODO Auto-generated method stub
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							// TODO Auto-generated method stub
 
-					}
-				}).setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+						}
+					}).setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
 
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						mImageAdapter.getItem(position);
-						mPicPaths.remove(position);
-						mImageAdapter.setPicPaths(mPicPaths);
-						Logger.debug(TAG, "remove one pic -->  mPicPaths.size()" + mPicPaths.size());
-					}
-				}).create();
-				dialog.show();
-				return true;
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							mImageAdapter.getItem(position);
+							mPicPaths.remove(position);
+							mImageAdapter.setPicPaths(mPicPaths);
+							Logger.debug(TAG, "remove one pic -->  mPicPaths.size()" + mPicPaths.size());
+						}
+					}).create();
+					dialog.show();
+					return true;
+				}
 			}
 		});
+		Button btnSatisfactionGood = (Button) findViewById(R.id.btn_satisfaction_good);
+		Button btnSatisfactionNormal = (Button) findViewById(R.id.btn_satisfaction_normal);
+		Button btnSatisfactionBad = (Button) findViewById(R.id.btn_satisfaction_bad);
+		btnSatisfactionGood.setOnClickListener(this);
+		btnSatisfactionNormal.setOnClickListener(this);
+		btnSatisfactionBad.setOnClickListener(this);
+		mETComment = (EditText) findViewById(R.id.et_comment);
+		if (mType == TargetListActivity.TYPE_INSPECT_SUPERVISE) {
+			for (int i = 0; i < mRGState.getChildCount(); i++) {
+				mRGState.getChildAt(i).setEnabled(false);
+			}
+			mRBarScore.setEnabled(false);
+			mTVRemark.setVisibility(View.VISIBLE);
+			mETRemark.setVisibility(View.GONE);
+			imgVTakePhoto.setVisibility(View.GONE);
+		}
 	}
 
 	private Dialog mPicDialog;
@@ -232,6 +265,14 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 				});
 			}
 			mETRemark.setText(mSubcategory.getIndex_remark());
+			mTVRemark.setText(mSubcategory.getIndex_remark());
+			mETComment.setText(mSubcategory.getQc_describe());
+			try {
+				int qc_state = Integer.valueOf(mSubcategory.getQc_state());
+				updateSatisfactionBtn(qc_state);
+			} catch (NumberFormatException e) {
+				e.printStackTrace();
+			}
 			final List<PicUrl> picUrls = mSubcategory.getIndex_pic();
 			if (picUrls != null) {
 				for (PicUrl picUrl : picUrls) {
@@ -245,6 +286,7 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 
 	private String getSubCategoryUrl(int categoryId) {
 		String url = Constant.BASE_URL + String.format("/api/v1/index/%d//index_log", categoryId);
+		Logger.debug(TAG, "getSubCategoryUrl -->  " + url);
 		return url;
 	}
 
@@ -265,14 +307,100 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 		case R.id.tv_save:
 			startSaveSubcategory();
 			break;
+		case R.id.btn_satisfaction_good:
+		case R.id.btn_satisfaction_normal:
+		case R.id.btn_satisfaction_bad:
+			changeSatisfaction(v.getId());
+			break;
 		default:
 			break;
 		}
 	}
 
-	private List<String> mNeedUploadPicPaths;
+	private void changeSatisfaction(int satisfactionId) {
+		findViewById(R.id.btn_satisfaction_good).setBackgroundResource(android.R.color.darker_gray);
+		findViewById(R.id.btn_satisfaction_normal).setBackgroundResource(android.R.color.darker_gray);
+		findViewById(R.id.btn_satisfaction_bad).setBackgroundResource(android.R.color.darker_gray);
+		switch (satisfactionId) {
+		case R.id.btn_satisfaction_good:
+			mSatisfaction = SATISFACTION_GOOD;
+			findViewById(R.id.btn_satisfaction_good).setBackgroundResource(R.color.blue);
+			break;
+		case R.id.btn_satisfaction_normal:
+			mSatisfaction = SATISFACTION_NORMAL;
+			findViewById(R.id.btn_satisfaction_normal).setBackgroundResource(R.color.blue);
+			break;
+		case R.id.btn_satisfaction_bad:
+			mSatisfaction = SATISFACTION_BAD;
+			findViewById(R.id.btn_satisfaction_bad).setBackgroundResource(R.color.blue);
+			break;
+
+		default:
+			break;
+		}
+	}
+	
+	private void updateSatisfactionBtn(int state) {
+		switch (state) {
+		case SATISFACTION_GOOD:
+			mSatisfaction = state;
+			findViewById(R.id.btn_satisfaction_good).setBackgroundResource(R.color.blue);
+			break;
+		case SATISFACTION_NORMAL:
+			mSatisfaction = state;
+			findViewById(R.id.btn_satisfaction_normal).setBackgroundResource(R.color.blue);
+			break;
+		case SATISFACTION_BAD:
+			mSatisfaction = state;
+			findViewById(R.id.btn_satisfaction_bad).setBackgroundResource(R.color.blue);
+			break;
+		default:
+			break;
+		}
+	}
 
 	private void startSaveSubcategory() {
+		if (mType == TargetListActivity.TYPE_INSPECT_SUPERVISE) {
+			startSaveSubcategoryBySuperintendent();
+		} else {
+			startSaveSubcategoryByDirector();
+		}
+	}
+	private void startSaveSubcategoryBySuperintendent() {
+		getProgressDialogUtils().show();
+		StringRequest stringRequest = new StringRequest(Method.PUT,
+				getUpdateSubCategoryUrlBySuperintendent(mSubcategory.getIndex_log_id()), new Response.Listener<String>() {
+
+					@Override
+					public void onResponse(String response) {
+						getProgressDialogUtils().cancel();
+						Logger.debug(TAG, "startSaveSubcategoryBySuperintendent success -->  " + response);
+						finish();
+					}
+				}, new Response.ErrorListener() {
+
+					@Override
+					public void onErrorResponse(VolleyError error) {
+						Logger.debug(TAG, "save fail -->  " + error.toString());
+						getProgressDialogUtils().cancel();
+						getToast().show(R.string.netword_fail);
+					}
+				}) {
+
+			@Override
+			protected Map<String, String> getParams() throws AuthFailureError {
+				Map<String, String> map = new HashMap<String, String>();
+				map.put("qc_state", String.valueOf(mSatisfaction));
+				map.put("qc_describe", mETComment.getText().toString());
+				map.put("qc_id", String.valueOf(getUserOperatorID()));
+				return map;
+			}
+
+		};
+		mQueue.add(stringRequest);
+	}
+
+	private void startSaveSubcategoryByDirector() {
 		getProgressDialogUtils().show();
 		mSubcategory.setIndex_pic(null);
 		Logger.debug(TAG, "uploadImage -->  mPicPaths.size()" + mPicPaths.size());
@@ -302,13 +430,13 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 				}
 				QiniuUploadManager manager = new QiniuUploadManager();
 				manager.multipleUpload(files, new IQiniuUploadManagerListener() {
-					
+
 					@Override
 					public void onMultipleUploadFail(String reason) {
 						getProgressDialogUtils().cancel();
 						getToast().show(getString(R.string.netword_fail) + reason);
 					}
-					
+
 					@Override
 					public void onMultipleUploadDone() {
 						List<PicUrl> picUrls = mSubcategory.getIndex_pic();
@@ -317,7 +445,8 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 						}
 						for (Map<String, String> map : files) {
 							PicUrl picUrl = new PicUrl();
-							picUrl.setPic_url(QiniuUploadManager.getFileHttpUrlByName(map.get(QiniuUploadManager.KEY_SAVE_NAME)));
+							picUrl.setPic_url(
+									QiniuUploadManager.getFileHttpUrlByName(map.get(QiniuUploadManager.KEY_SAVE_NAME)));
 							picUrls.add(picUrl);
 						}
 						mSubcategory.setIndex_pic(picUrls);
@@ -338,7 +467,7 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 		}
 		mSubcategory.setIndex_remark(mETRemark.getText().toString());
 		StringRequest stringRequest = new StringRequest(Method.PUT,
-				getUpdateSubCategoryUrl(mSubcategory.getIndex_log_id()), new Response.Listener<String>() {
+				getUpdateSubCategoryUrlByDirector(mSubcategory.getIndex_log_id()), new Response.Listener<String>() {
 
 					@Override
 					public void onResponse(String response) {
@@ -365,47 +494,56 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 		mQueue.add(stringRequest);
 	}
 
-	private String getUpdateSubCategoryUrl(int indexLogId) {
-		return Constant.BASE_URL + String.format("/api/v1/index/%d/index_log", indexLogId);
+	private String getUpdateSubCategoryUrlByDirector(int indexLogId) {
+		String url = Constant.BASE_URL + String.format("/api/v1/index/%d/index_log", indexLogId);
+		Logger.debug(TAG, "getUpdateSubCategoryUrl -->  " + url);
+		return url;
+	}
+	
+	private String getUpdateSubCategoryUrlBySuperintendent(int indexLogId) {
+		String url = Constant.BASE_URL + String.format("/api/v1/index/%d/index_log_qc", indexLogId);
+		Logger.debug(TAG, "getUpdateSubCategoryUrl -->  " + url);
+		return url;
 	}
 
-//	private void uploadImage(final int id) {
-//		if (mNeedUploadPicPaths.size() > id) {
-//			String path = mNeedUploadPicPaths.get(id);
-//			Logger.debug(TAG, "uploadImage --> picPath: " + path);
-//			getProgressDialogUtils().show();
-//			QiniuUploadUitls.getInstance().uploadImage(getBitmap(path), new IQiniuUploadUitlsListener() {
-//
-//				@Override
-//				public void onSucess(String fileUrl) {
-//					Logger.debug(TAG, fileUrl);
-//					getProgressDialogUtils().cancel();
-//					List<PicUrl> picUrls = mSubcategory.getIndex_pic();
-//					if (picUrls == null) {
-//						picUrls = new ArrayList<>();
-//					}
-//					PicUrl picUrl = new PicUrl();
-//					picUrl.setPic_url(fileUrl);
-//					picUrls.add(picUrl);
-//					mSubcategory.setIndex_pic(picUrls);
-//					uploadImage(id + 1);
-//				}
-//
-//				@Override
-//				public void onProgress(int progress) {
-//
-//				}
-//
-//				@Override
-//				public void onError(int errorCode, String msg) {
-//					getProgressDialogUtils().cancel();
-//					getToast().show(getString(R.string.netword_fail) + msg);
-//				}
-//			});
-//		} else {
-//			save();
-//		}
-//	}
+	// private void uploadImage(final int id) {
+	// if (mNeedUploadPicPaths.size() > id) {
+	// String path = mNeedUploadPicPaths.get(id);
+	// Logger.debug(TAG, "uploadImage --> picPath: " + path);
+	// getProgressDialogUtils().show();
+	// QiniuUploadUitls.getInstance().uploadImage(getBitmap(path), new
+	// IQiniuUploadUitlsListener() {
+	//
+	// @Override
+	// public void onSucess(String fileUrl) {
+	// Logger.debug(TAG, fileUrl);
+	// getProgressDialogUtils().cancel();
+	// List<PicUrl> picUrls = mSubcategory.getIndex_pic();
+	// if (picUrls == null) {
+	// picUrls = new ArrayList<>();
+	// }
+	// PicUrl picUrl = new PicUrl();
+	// picUrl.setPic_url(fileUrl);
+	// picUrls.add(picUrl);
+	// mSubcategory.setIndex_pic(picUrls);
+	// uploadImage(id + 1);
+	// }
+	//
+	// @Override
+	// public void onProgress(int progress) {
+	//
+	// }
+	//
+	// @Override
+	// public void onError(int errorCode, String msg) {
+	// getProgressDialogUtils().cancel();
+	// getToast().show(getString(R.string.netword_fail) + msg);
+	// }
+	// });
+	// } else {
+	// save();
+	// }
+	// }
 
 	private Bitmap getBitmap(String picPath) {
 		return ImageTool.compressBitmap(picPath, 320, 240);
@@ -416,7 +554,8 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 		if (requestCode == REQUEST_CODE_IMAGE_CAPTURE) {
 			if (resultCode == RESULT_OK) {
 				if (!TextUtil.isEmpty(photoUriPath)) {
-					String cpmpressBitMapPath = Constant.BASE_IMAGE_CAPTURE_PATH + System.currentTimeMillis() + Constant.PIC_END_STR;
+					String cpmpressBitMapPath = Constant.BASE_IMAGE_CAPTURE_PATH + System.currentTimeMillis()
+							+ Constant.PIC_END_STR;
 					if (ImageTool.saveBitmapToJpegFile(getBitmap(photoUriPath), cpmpressBitMapPath)) {
 						mPicPaths.add(cpmpressBitMapPath);
 					} else {

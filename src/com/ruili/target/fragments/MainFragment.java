@@ -11,7 +11,6 @@ import com.ruili.target.activitys.TargetListActivity;
 import com.ruili.target.adapters.MainFragmentAdapter;
 import com.ruili.target.entity.Category;
 import com.ruili.target.entity.CategoryDTO;
-import com.ruili.target.entity.ResponseDTO;
 import com.ruili.target.utils.Constant;
 import com.ruili.target.utils.JsonUtil;
 import com.ruili.target.utils.Logger;
@@ -29,7 +28,9 @@ public class MainFragment extends ListFragment {
 	private TargetListActivity mActivity;
 	private MainFragmentAdapter mAdapter;
 	private static final String TAG = MainFragment.class.getSimpleName();
-
+	private int mOperatorID = -1;
+	private String mDate = null;
+	
 	public void setActivity(TargetListActivity activity) {
 		this.mActivity = activity;
 	}
@@ -37,21 +38,6 @@ public class MainFragment extends ListFragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		return inflater.inflate(R.layout.fragment_main, container, false);
-	}
-
-	
-	@Override
-	public void onResume() {
-		super.onResume();
-		if (!(mAdapter.getCount() > 0)) {
-			if (mActivity.getType() == TargetListActivity.TYPE_INSPECT_SUPERVISE) {
-				if (mOperatorID != -1) {
-					updateData(mOperatorID);
-				}
-			} else {
-				updateData(mOperatorID == -1 ? mActivity.getUserOperatorID() : mOperatorID);
-			}
-		}
 	}
 
 	@Override
@@ -73,11 +59,15 @@ public class MainFragment extends ListFragment {
 		super.onAttach(activity);
 	}
 
-	private int mOperatorID = -1;
-	public void updateData(int operatorID) {
+	public void setParams(String date, int operatorID) {
 		mOperatorID = operatorID;
+		mDate = date;
+		updateData();
+	}
+	
+	private void updateData() {
 		mActivity.getProgressDialogUtils().show("");
-		StringRequest stringRequest = new StringRequest(Method.GET, getCategoryUrl(operatorID),
+		StringRequest stringRequest = new StringRequest(Method.GET, getCategoryUrl(),
 				new Response.Listener<String>() {
 
 					@Override
@@ -115,8 +105,18 @@ public class MainFragment extends ListFragment {
 			mActivity.getToast().show(mActivity.getResources().getText(R.string.service_fail) + response);
 		}
 	}
-	private String getCategoryUrl(int operatorID) {
-		return Constant.BASE_URL + String.format("/api/v1/index/%d/big_indexs", operatorID);
+	private String getCategoryUrl() {
+		String url = Constant.BASE_URL + String.format("/api/v1/index/%d/big_indexs", mOperatorID);
+		if (mActivity.getType() == TargetListActivity.TYPE_INSPECT_SUPERVISE) {
+			url = Constant.BASE_URL + String.format("/api/v1/index/%s/%d/big_indexs", mDate, mOperatorID);
+		}
+		Logger.debug(TAG, "getCategoryUrl -->  " + url);
+		return url;
+	}
+
+	public void setDate(String date) {
+		mDate = date;
+		updateData();
 	}
 
 }

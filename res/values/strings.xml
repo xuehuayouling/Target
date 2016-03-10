@@ -24,6 +24,9 @@
     <string name="save">保存</string>
     <string name="delete">删除</string>
     <string name="delete_confirm">是否删除？</string>
+    <string name="satisfaction_good">满意</string>
+    <string name="satisfaction_normal">一般</string>
+    <string name="satisfaction_bad">不满意</string>
     <string name="capture_image_fail">拍照失败，请重试</string>
     
     <string name="app_picker_name">Applications</string>

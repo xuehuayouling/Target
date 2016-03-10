@@ -30,7 +30,11 @@ public class MainFragmentAdapter extends BaseAdapter {
 	}
 	
 	public void setCategories(List<Category> categories) {
-		this.mCategories = categories;
+		if (null == categories) {
+			mCategories = new ArrayList<>();
+		} else {
+			mCategories = categories;
+		}
 		notifyDataSetChanged();
 	}
 
