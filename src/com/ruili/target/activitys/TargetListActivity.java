@@ -21,6 +21,7 @@ import com.ruili.target.fragments.MainFragment;
 import com.ruili.target.utils.Constant;
 import com.ruili.target.utils.Logger;
 
+import android.app.DatePickerDialog;
 import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
@@ -33,6 +34,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.PopupWindow;
@@ -52,6 +54,7 @@ public class TargetListActivity extends BaseActivity implements OnClickListener 
 	private List<CheckTime> mCheckTimes;
 	// 今日指标、历史指标、监督管理
 	private int mType;
+	private TextView mTVDate;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -70,24 +73,27 @@ public class TargetListActivity extends BaseActivity implements OnClickListener 
 	private void initActionbar() {
 		ImageView ivBack = (ImageView) findViewById(R.id.iv_back);
 		ImageView ivMenu = (ImageView) findViewById(R.id.iv_menu);
-		TextView tvDate = (TextView) findViewById(R.id.tv_date);
+		mTVDate = (TextView) findViewById(R.id.tv_date);
+		mTVDate.setText(getDateString(new Date()));
 		TextView tvEmployee = (TextView) findViewById(R.id.tv_employee);
 		SearchView svSearch = (SearchView) findViewById(R.id.sv_search);
 		TextView tvScan = (TextView) findViewById(R.id.tv_scan);
 		ivBack.setOnClickListener(this);
 		ivMenu.setOnClickListener(this);
 		tvEmployee.setOnClickListener(this);
-		tvDate.setOnClickListener(this);
+		mTVDate.setOnClickListener(this);
 		svSearch.setOnClickListener(this);
 		tvScan.setOnClickListener(this);
 		switch (mType) {
 		case TYPE_TODAY:
-			tvDate.setVisibility(View.GONE);
+			mTVDate.setVisibility(View.GONE);
 			tvEmployee.setVisibility(View.GONE);
 			svSearch.setVisibility(View.GONE);
 			break;
 		case TYPE_HISTORY:
+			break;
 		case TYPE_INSPECT_SUPERVISE:
+			tvScan.setVisibility(View.GONE);
 			break;
 		default:
 			break;
@@ -106,11 +112,9 @@ public class TargetListActivity extends BaseActivity implements OnClickListener 
 	}
 
 	public void onMainListItemClick(Category category) {
-		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.US);  
-        String data =format.format(new Date());  
-		updateDetailsList(category.getId(), -1, data);
+		updateDetailsList(category.getId(), -1, mTVDate.getText().toString());
 	}
-	
+
 	private void updateDetailsList(int categoryId, int checktimeID, String date) {
 		mDetailFragment.updateData(categoryId, checktimeID, date);
 	}
@@ -129,9 +133,32 @@ public class TargetListActivity extends BaseActivity implements OnClickListener 
 		case R.id.iv_menu:
 			showOrHideTimeMenus();
 			break;
+		case R.id.tv_date:
+			showDatePickerDialog();
+			break;
 		default:
 			break;
 		}
+	}
+	private String getDateString(Date date) {
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+		String data = format.format(date);
+		return data;
+	}
+	
+	private void showDatePickerDialog() {
+		Calendar c = Calendar.getInstance();
+		DatePickerDialog dialog = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
+			public void onDateSet(DatePicker dp, int year, int month, int dayOfMonth) {
+				mTVDate.setText(getDateString(new Date(year, month, dayOfMonth)));
+				mDetailFragment.setDate(mTVDate.getText().toString());
+			}
+			
+		}, c.get(Calendar.YEAR), // 传入年份
+				c.get(Calendar.MONTH), // 传入月份
+				c.get(Calendar.DAY_OF_MONTH) // 传入天数
+		);
+		dialog.show();
 	}
 
 	public void setCheckTimes(List<CheckTime> times) {
@@ -182,7 +209,8 @@ public class TargetListActivity extends BaseActivity implements OnClickListener 
 						dismissTimeMenus();
 					}
 				});
-				mTimeMenus = new PopupWindow(view, getResources().getDimensionPixelSize(R.dimen.popup_menu_width), LayoutParams.WRAP_CONTENT);
+				mTimeMenus = new PopupWindow(view, getResources().getDimensionPixelSize(R.dimen.popup_menu_width),
+						LayoutParams.WRAP_CONTENT);
 				mTimeMenus.setBackgroundDrawable(new BitmapDrawable());
 				mTimeMenus.setFocusable(true);
 				mTimeMenus.setOutsideTouchable(true);
@@ -215,7 +243,7 @@ public class TargetListActivity extends BaseActivity implements OnClickListener 
 
 					@Override
 					public void onResponse(String response) {
-						Logger.debug(TAG , "decodeBarcode success -->  " + response);
+						Logger.debug(TAG, "decodeBarcode success -->  " + response);
 						mProgressDialogUtils.cancel();
 						mMainFragment.updateData();
 					}

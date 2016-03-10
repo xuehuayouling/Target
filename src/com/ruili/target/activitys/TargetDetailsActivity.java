@@ -273,6 +273,7 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 	private List<String> mNeedUploadPicPaths;
 
 	private void startSaveSubcategory() {
+		getProgressDialogUtils().show();
 		mSubcategory.setIndex_pic(null);
 		Logger.debug(TAG, "uploadImage -->  mPicPaths.size()" + mPicPaths.size());
 		if (mPicPaths.size() > 0) {
@@ -291,38 +292,41 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 					mSubcategory.setIndex_pic(picUrls);
 				}
 			}
-			final List<Map<String, String>> files = new ArrayList<>();
-			for (String path : mNeedUploadPicPaths) {
-				Map<String, String> map = new HashMap<>();
-				map.put(QiniuUploadManager.KEY_FILE_PATH, path);
-				map.put(QiniuUploadManager.KEY_SAVE_NAME, path.replace(Constant.BASE_IMAGE_CAPTURE_PATH, ""));
-				files.add(map);
+			if (!mNeedUploadPicPaths.isEmpty()) {
+				final List<Map<String, String>> files = new ArrayList<>();
+				for (String path : mNeedUploadPicPaths) {
+					Map<String, String> map = new HashMap<>();
+					map.put(QiniuUploadManager.KEY_FILE_PATH, path);
+					map.put(QiniuUploadManager.KEY_SAVE_NAME, path.replace(Constant.BASE_IMAGE_CAPTURE_PATH, ""));
+					files.add(map);
+				}
+				QiniuUploadManager manager = new QiniuUploadManager();
+				manager.multipleUpload(files, new IQiniuUploadManagerListener() {
+					
+					@Override
+					public void onMultipleUploadFail(String reason) {
+						getProgressDialogUtils().cancel();
+						getToast().show(getString(R.string.netword_fail) + reason);
+					}
+					
+					@Override
+					public void onMultipleUploadDone() {
+						List<PicUrl> picUrls = mSubcategory.getIndex_pic();
+						if (picUrls == null) {
+							picUrls = new ArrayList<>();
+						}
+						for (Map<String, String> map : files) {
+							PicUrl picUrl = new PicUrl();
+							picUrl.setPic_url(QiniuUploadManager.getFileHttpUrlByName(map.get(QiniuUploadManager.KEY_SAVE_NAME)));
+							picUrls.add(picUrl);
+						}
+						mSubcategory.setIndex_pic(picUrls);
+						save();
+					}
+				});
+			} else {
+				save();
 			}
-			QiniuUploadManager manager = new QiniuUploadManager();
-			getProgressDialogUtils().show();
-			manager.multipleUpload(files, new IQiniuUploadManagerListener() {
-				
-				@Override
-				public void onMultipleUploadFail(String reason) {
-					getProgressDialogUtils().cancel();
-					getToast().show(getString(R.string.netword_fail) + reason);
-				}
-				
-				@Override
-				public void onMultipleUploadDone() {
-					List<PicUrl> picUrls = mSubcategory.getIndex_pic();
-					if (picUrls == null) {
-						picUrls = new ArrayList<>();
-					}
-					for (Map<String, String> map : files) {
-						PicUrl picUrl = new PicUrl();
-						picUrl.setPic_url(QiniuUploadManager.getFileHttpUrlByName(map.get(QiniuUploadManager.KEY_SAVE_NAME)));
-						picUrls.add(picUrl);
-					}
-					mSubcategory.setIndex_pic(picUrls);
-					save();
-				}
-			});
 		} else {
 			save();
 		}
@@ -365,46 +369,46 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 		return Constant.BASE_URL + String.format("/api/v1/index/%d/index_log", indexLogId);
 	}
 
-	private void uploadImage(final int id) {
-		if (mNeedUploadPicPaths.size() > id) {
-			String path = mNeedUploadPicPaths.get(id);
-			Logger.debug(TAG, "uploadImage --> picPath: " + path);
-			getProgressDialogUtils().show();
-			QiniuUploadUitls.getInstance().uploadImage(getBitmap(path), new IQiniuUploadUitlsListener() {
-
-				@Override
-				public void onSucess(String fileUrl) {
-					Logger.debug(TAG, fileUrl);
-					getProgressDialogUtils().cancel();
-					List<PicUrl> picUrls = mSubcategory.getIndex_pic();
-					if (picUrls == null) {
-						picUrls = new ArrayList<>();
-					}
-					PicUrl picUrl = new PicUrl();
-					picUrl.setPic_url(fileUrl);
-					picUrls.add(picUrl);
-					mSubcategory.setIndex_pic(picUrls);
-					uploadImage(id + 1);
-				}
-
-				@Override
-				public void onProgress(int progress) {
-
-				}
-
-				@Override
-				public void onError(int errorCode, String msg) {
-					getProgressDialogUtils().cancel();
-					getToast().show(getString(R.string.netword_fail) + msg);
-				}
-			});
-		} else {
-			save();
-		}
-	}
+//	private void uploadImage(final int id) {
+//		if (mNeedUploadPicPaths.size() > id) {
+//			String path = mNeedUploadPicPaths.get(id);
+//			Logger.debug(TAG, "uploadImage --> picPath: " + path);
+//			getProgressDialogUtils().show();
+//			QiniuUploadUitls.getInstance().uploadImage(getBitmap(path), new IQiniuUploadUitlsListener() {
+//
+//				@Override
+//				public void onSucess(String fileUrl) {
+//					Logger.debug(TAG, fileUrl);
+//					getProgressDialogUtils().cancel();
+//					List<PicUrl> picUrls = mSubcategory.getIndex_pic();
+//					if (picUrls == null) {
+//						picUrls = new ArrayList<>();
+//					}
+//					PicUrl picUrl = new PicUrl();
+//					picUrl.setPic_url(fileUrl);
+//					picUrls.add(picUrl);
+//					mSubcategory.setIndex_pic(picUrls);
+//					uploadImage(id + 1);
+//				}
+//
+//				@Override
+//				public void onProgress(int progress) {
+//
+//				}
+//
+//				@Override
+//				public void onError(int errorCode, String msg) {
+//					getProgressDialogUtils().cancel();
+//					getToast().show(getString(R.string.netword_fail) + msg);
+//				}
+//			});
+//		} else {
+//			save();
+//		}
+//	}
 
 	private Bitmap getBitmap(String picPath) {
-		return ImageTool.compressBitmap(picPath, 200, 150);
+		return ImageTool.compressBitmap(picPath, 320, 240);
 	}
 
 	@Override
@@ -412,7 +416,12 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 		if (requestCode == REQUEST_CODE_IMAGE_CAPTURE) {
 			if (resultCode == RESULT_OK) {
 				if (!TextUtil.isEmpty(photoUriPath)) {
-					mPicPaths.add(photoUriPath);
+					String cpmpressBitMapPath = Constant.BASE_IMAGE_CAPTURE_PATH + System.currentTimeMillis() + Constant.PIC_END_STR;
+					if (ImageTool.saveBitmapToJpegFile(getBitmap(photoUriPath), cpmpressBitMapPath)) {
+						mPicPaths.add(cpmpressBitMapPath);
+					} else {
+						mPicPaths.add(photoUriPath);
+					}
 					mImageAdapter.setPicPaths(mPicPaths);
 				} else {
 					getToast().show(R.string.capture_image_fail);

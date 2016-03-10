@@ -64,6 +64,11 @@ public class DetailFragment extends ListFragment {
 		reloadData();
 	}
 	
+	public void setDate(String date) {
+		mDate = date;
+		reloadData();
+	}
+	
 	public void setCheckTimeID(int checkTimeID) {
 		mCheckTimeId = checkTimeID;
 		reloadData();
@@ -78,6 +83,9 @@ public class DetailFragment extends ListFragment {
 	}
 
 	private void reloadData() {
+		if (mCategoryId == -1 || mActivity.getUserOperatorID() < 1) {
+			return;
+		}
 		mActivity.getProgressDialogUtils().show("");
 		StringRequest stringRequest = new StringRequest(Method.GET, getSubCategoryUrl(),
 				new Response.Listener<String>() {
