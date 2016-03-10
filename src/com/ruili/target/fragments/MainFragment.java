@@ -44,7 +44,13 @@ public class MainFragment extends ListFragment {
 	public void onResume() {
 		super.onResume();
 		if (!(mAdapter.getCount() > 0)) {
-			updateData();
+			if (mActivity.getType() == TargetListActivity.TYPE_INSPECT_SUPERVISE) {
+				if (mOperatorID != -1) {
+					updateData(mOperatorID);
+				}
+			} else {
+				updateData(mOperatorID == -1 ? mActivity.getUserOperatorID() : mOperatorID);
+			}
 		}
 	}
 
@@ -67,9 +73,11 @@ public class MainFragment extends ListFragment {
 		super.onAttach(activity);
 	}
 
-	public void updateData() {
+	private int mOperatorID = -1;
+	public void updateData(int operatorID) {
+		mOperatorID = operatorID;
 		mActivity.getProgressDialogUtils().show("");
-		StringRequest stringRequest = new StringRequest(Method.GET, getCategoryUrl(),
+		StringRequest stringRequest = new StringRequest(Method.GET, getCategoryUrl(operatorID),
 				new Response.Listener<String>() {
 
 					@Override
@@ -98,15 +106,17 @@ public class MainFragment extends ListFragment {
 				List<Category> categories = dto.getData();
 				mAdapter.setCategories(categories);
 			} else {
+				mAdapter.setCategories(null);
 				mActivity.getToast().show(R.string.get_data_fail);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+			mAdapter.setCategories(null);
 			mActivity.getToast().show(mActivity.getResources().getText(R.string.service_fail) + response);
 		}
 	}
-	private String getCategoryUrl() {
-		return Constant.BASE_URL + String.format("/api/v1/index/%d/big_indexs", mActivity.getUserOperatorID());
+	private String getCategoryUrl(int operatorID) {
+		return Constant.BASE_URL + String.format("/api/v1/index/%d/big_indexs", operatorID);
 	}
 
 }

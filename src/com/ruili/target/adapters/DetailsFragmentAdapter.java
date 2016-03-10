@@ -93,6 +93,10 @@ public class DetailsFragmentAdapter extends BaseAdapter {
 		if (Subcategory.INDEX_TYPE_YESNO == subcategory.getIndex_type()) {
 			holder.llScore.setVisibility(View.GONE);
 			holder.rgState.setVisibility(View.VISIBLE);
+			if (mActivity.getType() == TargetListActivity.TYPE_INSPECT_SUPERVISE) {
+				holder.rgState.findViewById(R.id.rbtn_yes).setEnabled(false);
+				holder.rgState.findViewById(R.id.rbtn_no).setEnabled(false);
+			}
 			if (subcategory.getIndex_complete() == Subcategory.INDEX_COMPLETE_YES) {
 				holder.rgState.check(R.id.rbtn_yes);
 			} else if (subcategory.getIndex_complete() == Subcategory.INDEX_COMPLETE_NO) {
@@ -120,6 +124,9 @@ public class DetailsFragmentAdapter extends BaseAdapter {
 		} else if (Subcategory.INDEX_TYPE_SCORE == subcategory.getIndex_type()) {
 			holder.rgState.setVisibility(View.GONE);
 			holder.llScore.setVisibility(View.VISIBLE);
+			if (mActivity.getType() == TargetListActivity.TYPE_INSPECT_SUPERVISE) {
+				holder.rbarScore.setEnabled(false);
+			}
 			int score;
 			try {
 				score = Integer.valueOf(subcategory.getIndex_score());

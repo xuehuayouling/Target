@@ -16,9 +16,14 @@ import com.google.zxing.client.android.CaptureActivity;
 import com.ruili.target.R;
 import com.ruili.target.entity.Category;
 import com.ruili.target.entity.CheckTime;
+import com.ruili.target.entity.Employee;
+import com.ruili.target.entity.EmployeeListDTO;
+import com.ruili.target.entity.Subcategory;
+import com.ruili.target.entity.SubcategoryListDTO;
 import com.ruili.target.fragments.DetailFragment;
 import com.ruili.target.fragments.MainFragment;
 import com.ruili.target.utils.Constant;
+import com.ruili.target.utils.JsonUtil;
 import com.ruili.target.utils.Logger;
 
 import android.app.DatePickerDialog;
@@ -27,6 +32,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -55,6 +61,7 @@ public class TargetListActivity extends BaseActivity implements OnClickListener 
 	// 今日指标、历史指标、监督管理
 	private int mType;
 	private TextView mTVDate;
+	private TextView mTVEmployee;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -75,19 +82,19 @@ public class TargetListActivity extends BaseActivity implements OnClickListener 
 		ImageView ivMenu = (ImageView) findViewById(R.id.iv_menu);
 		mTVDate = (TextView) findViewById(R.id.tv_date);
 		mTVDate.setText(getDateString(new Date()));
-		TextView tvEmployee = (TextView) findViewById(R.id.tv_employee);
+		mTVEmployee = (TextView) findViewById(R.id.tv_employee);
 		SearchView svSearch = (SearchView) findViewById(R.id.sv_search);
 		TextView tvScan = (TextView) findViewById(R.id.tv_scan);
 		ivBack.setOnClickListener(this);
 		ivMenu.setOnClickListener(this);
-		tvEmployee.setOnClickListener(this);
+		mTVEmployee.setOnClickListener(this);
 		mTVDate.setOnClickListener(this);
 		svSearch.setOnClickListener(this);
 		tvScan.setOnClickListener(this);
 		switch (mType) {
 		case TYPE_TODAY:
 			mTVDate.setVisibility(View.GONE);
-			tvEmployee.setVisibility(View.GONE);
+			mTVEmployee.setVisibility(View.GONE);
 			svSearch.setVisibility(View.GONE);
 			break;
 		case TYPE_HISTORY:
@@ -111,6 +118,9 @@ public class TargetListActivity extends BaseActivity implements OnClickListener 
 		return mQueue;
 	}
 
+	public int getType() {
+		return mType;
+	}
 	public void onMainListItemClick(Category category) {
 		updateDetailsList(category.getId(), -1, mTVDate.getText().toString());
 	}
@@ -127,8 +137,7 @@ public class TargetListActivity extends BaseActivity implements OnClickListener 
 			break;
 		case R.id.tv_scan:
 			// showCaptureActivity();
-			mDetailFragment.clear();
-			mMainFragment.updateData();
+			updateMainFragment(getUserOperatorID());
 			break;
 		case R.id.iv_menu:
 			showOrHideTimeMenus();
@@ -136,10 +145,15 @@ public class TargetListActivity extends BaseActivity implements OnClickListener 
 		case R.id.tv_date:
 			showDatePickerDialog();
 			break;
+		case R.id.tv_employee:
+			showOrHideEmployeeMenus();
+			break;
 		default:
 			break;
 		}
 	}
+	
+	
 	private String getDateString(Date date) {
 		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
 		String data = format.format(date);
@@ -150,7 +164,7 @@ public class TargetListActivity extends BaseActivity implements OnClickListener 
 		Calendar c = Calendar.getInstance();
 		DatePickerDialog dialog = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
 			public void onDateSet(DatePicker dp, int year, int month, int dayOfMonth) {
-				mTVDate.setText(getDateString(new Date(year, month, dayOfMonth)));
+				mTVDate.setText(getDateString(new Date(year - 1900, month, dayOfMonth)));
 				mDetailFragment.setDate(mTVDate.getText().toString());
 			}
 			
@@ -176,10 +190,71 @@ public class TargetListActivity extends BaseActivity implements OnClickListener 
 			mTimeMenus.dismiss();
 		}
 	}
+	
+	private void dismissEmployeeMenus() {
+		if (mEmployeeMenus != null && mEmployeeMenus.isShowing()) {
+			mEmployeeMenus.dismiss();
+		}
+	}
 
 	private PopupWindow mTimeMenus;
 	private ArrayAdapter<CheckTime> mTimeMenuAdapter;
 	protected static final String TAG = TargetListActivity.class.getSimpleName();
+
+	private PopupWindow mEmployeeMenus;
+	private ArrayAdapter<Employee> mEmployeeMenuAdapter;
+	
+	private void showOrHideEmployeeMenus() {
+		if (mEmployeeMenus != null && mEmployeeMenus.isShowing()) {
+			dismissEmployeeMenus();
+		} else {
+			getEmployeesAndShowMenu();
+			
+		}
+	}
+
+	private void getEmployeesAndShowMenu() {
+		mProgressDialogUtils.show();
+		StringRequest stringRequest = new StringRequest(Method.GET, getEmployeesUrl(),
+				new Response.Listener<String>() {
+
+					@Override
+					public void onResponse(String response) {
+						mProgressDialogUtils.cancel();
+						decodeEmployeesAndShowMenu(response);
+					}
+				}, new Response.ErrorListener() {
+
+					@Override
+					public void onErrorResponse(VolleyError error) {
+						Logger.debug(TAG, "decodeBarcode fail -->  " + error.toString());
+						mProgressDialogUtils.cancel();
+						mToast.show(R.string.netword_fail);
+					}
+				});
+		mQueue.add(stringRequest);
+		
+	}
+
+	protected void decodeEmployeesAndShowMenu(String response) {
+		Log.d(TAG, response);
+		try {
+			EmployeeListDTO dto = JsonUtil.parseObject(response, EmployeeListDTO.class);
+			if (dto.isValid()) {
+				List<Employee> employees = dto.getData();
+				showEmployeeMenus(employees);
+			} else {
+				getToast().show(getString(R.string.get_data_fail) + response);
+			}
+		} catch (Exception e) {
+			getToast().show(getResources().getText(R.string.service_fail) + response);
+			e.printStackTrace();
+		}
+	}
+
+	private String getEmployeesUrl() {
+		return Constant.BASE_URL + "/api/v1/index/1/operators";
+	}
 
 	private void showOrHideTimeMenus() {
 		if (mTimeMenus != null && mTimeMenus.isShowing()) {
@@ -188,7 +263,7 @@ public class TargetListActivity extends BaseActivity implements OnClickListener 
 			showTimeMenus();
 		}
 	}
-
+	
 	private void showTimeMenus() {
 		if (mCheckTimes != null && mCheckTimes.size() > 0) {
 			if (mTimeMenus == null) {
@@ -222,6 +297,41 @@ public class TargetListActivity extends BaseActivity implements OnClickListener 
 			mTimeMenus.showAsDropDown(findViewById(R.id.iv_menu), 10, 10);
 		}
 	}
+	
+	private void showEmployeeMenus(List<Employee> employees) {
+		if (employees != null && employees.size() > 0) {
+			if (mEmployeeMenus == null) {
+				LayoutInflater layoutInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+				View view = layoutInflater.inflate(R.layout.widget_list, null);
+				ListView lvMenus = (ListView) view.findViewById(R.id.lv_list);
+				if (mEmployeeMenuAdapter == null) {
+					mEmployeeMenuAdapter = new ArrayAdapter<>(this, R.layout.widget_simple_list_item);
+				}
+				mEmployeeMenuAdapter.clear();
+				mEmployeeMenuAdapter.addAll(employees);
+				lvMenus.setAdapter(mEmployeeMenuAdapter);
+				lvMenus.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+					@Override
+					public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+						updateMainFragment(mEmployeeMenuAdapter.getItem(position).getOperator_id());
+						mTVEmployee.setText(mEmployeeMenuAdapter.getItem(position).getName());
+						dismissEmployeeMenus();
+					}
+				});
+				mEmployeeMenus = new PopupWindow(view, getResources().getDimensionPixelSize(R.dimen.popup_menu_width),
+						LayoutParams.WRAP_CONTENT);
+				mEmployeeMenus.setBackgroundDrawable(new BitmapDrawable());
+				mEmployeeMenus.setFocusable(true);
+				mEmployeeMenus.setOutsideTouchable(true);
+				mEmployeeMenus.update();
+			} else {
+				mEmployeeMenuAdapter.clear();
+				mEmployeeMenuAdapter.addAll(employees);
+			}
+			mEmployeeMenus.showAsDropDown(findViewById(R.id.tv_employee), 10, 10);
+		}
+	}
 
 	private void showCaptureActivity() {
 		Intent intent = new Intent(this, CaptureActivity.class);
@@ -245,7 +355,7 @@ public class TargetListActivity extends BaseActivity implements OnClickListener 
 					public void onResponse(String response) {
 						Logger.debug(TAG, "decodeBarcode success -->  " + response);
 						mProgressDialogUtils.cancel();
-						mMainFragment.updateData();
+						updateMainFragment(getUserOperatorID());
 					}
 				}, new Response.ErrorListener() {
 
@@ -261,6 +371,11 @@ public class TargetListActivity extends BaseActivity implements OnClickListener 
 
 	private String getBarcodeUrl(String barcode) {
 		return Constant.BASE_URL + String.format("/api/v1/index/%d/%s", getUserOperatorID(), barcode);
+	}
+
+	private void updateMainFragment(int operatorID) {
+		mDetailFragment.clear();
+		mMainFragment.updateData(operatorID);
 	}
 
 }
