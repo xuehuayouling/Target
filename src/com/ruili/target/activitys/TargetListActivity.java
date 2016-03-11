@@ -360,11 +360,13 @@ public class TargetListActivity extends BaseActivity implements OnClickListener 
 		startActivityForResult(intent, SCAN_REQUEST_CODE);
 	}
 
+	// 用于判断是不是第一次进入页面
 	private boolean isFirstResume = true;
 	@Override
 	protected void onResume() {
 		super.onResume();
-		if (mType == TYPE_HISTORY && isFirstResume) {
+		if ((mType == TYPE_TODAY || mType == TYPE_HISTORY) && isFirstResume) {
+			isFirstResume = false;
 			updateMainFragment();
 		}
 	}
