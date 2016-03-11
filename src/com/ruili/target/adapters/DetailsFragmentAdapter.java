@@ -110,15 +110,21 @@ public class DetailsFragmentAdapter extends BaseAdapter {
 				public void onCheckedChanged(RadioGroup group, int checkedId) {
 					switch (checkedId) {
 					case R.id.rbtn_yes:
-						subcategory.setIndex_complete(Subcategory.INDEX_COMPLETE_YES);
+						if (subcategory.getIndex_complete() != Subcategory.INDEX_COMPLETE_YES) {
+							subcategory.setIndex_complete(Subcategory.INDEX_COMPLETE_YES);
+							updateSubcategory(subcategory, viewState);
+						}
 						break;
 					case R.id.rbtn_no:
-						subcategory.setIndex_complete(Subcategory.INDEX_COMPLETE_NO);
+						if (subcategory.getIndex_complete() != Subcategory.INDEX_COMPLETE_NO) {
+							subcategory.setIndex_complete(Subcategory.INDEX_COMPLETE_NO);
+							updateSubcategory(subcategory, viewState);
+						}
 						break;
 					default:
 						break;
 					}
-					updateSubcategory(subcategory, viewState);
+					
 				}
 			});
 		} else if (Subcategory.INDEX_TYPE_SCORE == subcategory.getIndex_type()) {
@@ -127,13 +133,12 @@ public class DetailsFragmentAdapter extends BaseAdapter {
 			if (mActivity.getType() == TargetListActivity.TYPE_INSPECT_SUPERVISE || mActivity.getType() == TargetListActivity.TYPE_HISTORY) {
 				holder.rbarScore.setEnabled(false);
 			}
-			int score;
+			int score = 0;
 			try {
 				score = Integer.valueOf(subcategory.getIndex_score());
-				holder.rbarScore.setRating(score);
 			} catch (NumberFormatException e) {
-				e.printStackTrace();
 			}
+			holder.rbarScore.setRating(score);
 			holder.rbarScore.setOnRatingBarChangeListener(new OnRatingBarChangeListener() {
 				
 				@Override

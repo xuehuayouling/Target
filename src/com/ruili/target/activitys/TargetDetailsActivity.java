@@ -323,7 +323,12 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 			if (mSubcategory.getIndex_type() == Subcategory.INDEX_TYPE_SCORE) {
 				mRGState.setVisibility(View.GONE);
 				mRBarScore.setVisibility(View.VISIBLE);
-				mRBarScore.setRating(Integer.valueOf(mSubcategory.getIndex_score()));
+				int score = 0;
+				try {
+					score = Integer.valueOf(mSubcategory.getIndex_score());
+				} catch (NumberFormatException e) {
+				}
+				mRBarScore.setRating(score);
 			} else {
 				mRGState.setVisibility(View.VISIBLE);
 				mRBarScore.setVisibility(View.GONE);
@@ -337,12 +342,12 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 			}
 			mETRemark.setText(mSubcategory.getIndex_remark());
 			mETComment.setText(mSubcategory.getQc_describe());
+			int qc_state = 0;
 			try {
-				int qc_state = Integer.valueOf(mSubcategory.getQc_state());
-				updateSatisfactionBtns(qc_state);
+				qc_state = Integer.valueOf(mSubcategory.getQc_state());
 			} catch (NumberFormatException e) {
-				e.printStackTrace();
 			}
+			updateSatisfactionBtns(qc_state);
 			final List<PicUrl> picUrls = mSubcategory.getIndex_pic();
 			if (picUrls != null) {
 				for (PicUrl picUrl : picUrls) {
