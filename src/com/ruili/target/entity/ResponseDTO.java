@@ -15,5 +15,7 @@ public abstract class ResponseDTO {
 	public boolean isValid() {
 		return 0 == error_code;
 	}
+
+	abstract public Object getData();
 	
 }

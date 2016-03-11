@@ -144,12 +144,6 @@
             android:inputType="text"
             tools:ignore="LabelFor" />
 
-        <TextView
-            android:id="@+id/tv_remark"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:maxLines="5"
-            android:visibility="gone" />
     </RelativeLayout>
 
     <LinearLayout
@@ -245,12 +239,6 @@
                 android:inputType="text"
                 tools:ignore="LabelFor" />
 
-            <TextView
-                android:id="@+id/tv_comment"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:maxLines="5"
-                android:visibility="gone" />
         </RelativeLayout>
     </LinearLayout>
 

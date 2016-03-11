@@ -10,15 +10,14 @@ import com.ruili.target.R;
 import com.ruili.target.activitys.TargetListActivity;
 import com.ruili.target.adapters.MainFragmentAdapter;
 import com.ruili.target.entity.Category;
-import com.ruili.target.entity.CategoryDTO;
+import com.ruili.target.entity.CategoryListDTO;
 import com.ruili.target.utils.Constant;
-import com.ruili.target.utils.JsonUtil;
+import com.ruili.target.utils.DecodeJsonResponseUtils;
 import com.ruili.target.utils.Logger;
 
 import android.app.Activity;
 import android.app.ListFragment;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,7 +29,7 @@ public class MainFragment extends ListFragment {
 	private static final String TAG = MainFragment.class.getSimpleName();
 	private int mOperatorID = -1;
 	private String mDate = null;
-	
+
 	public void setActivity(TargetListActivity activity) {
 		this.mActivity = activity;
 	}
@@ -43,7 +42,6 @@ public class MainFragment extends ListFragment {
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
 		final Category category = (Category) mAdapter.getItem(position);
-		mActivity.setCheckTimes(category.getChecktime());
 		mActivity.onMainListItemClick(category);
 	}
 
@@ -62,63 +60,51 @@ public class MainFragment extends ListFragment {
 	public void setParams(String date, int operatorID) {
 		mOperatorID = operatorID;
 		mDate = date;
-		updateData();
+		updateCategoryList();
 	}
-	
-	private void updateData() {
+
+	private void updateCategoryList() {
 		mActivity.getProgressDialogUtils().show("");
-		StringRequest stringRequest = new StringRequest(Method.GET, getCategoryUrl(),
+		StringRequest stringRequest = new StringRequest(Method.GET, getCategoryListUrl(),
 				new Response.Listener<String>() {
 
 					@Override
 					public void onResponse(String response) {
-						Logger.debug(TAG, "updateData success -->   " + response);
 						mActivity.getProgressDialogUtils().cancel();
-						decodeResponse(response);
+						decodeCategoryListResponse(response);
 					}
 				}, new Response.ErrorListener() {
 
 					@Override
 					public void onErrorResponse(VolleyError error) {
-						Logger.debug(TAG, "updateData fail -->  " + error.toString());
 						mActivity.getProgressDialogUtils().cancel();
 						mActivity.getToast().show(R.string.netword_fail);
+						Logger.debug(TAG, "getEmployeesAndShowMenu fail -->  " + error.toString());
 					}
 				});
 		mActivity.getRequestQueue().add(stringRequest);
 	}
-	
-	private void decodeResponse(String response) {
-		Log.d(TAG , response);
-		try {
-			CategoryDTO dto = JsonUtil.parseObject(response, CategoryDTO.class);
-			if (dto.isValid()) {
-				List<Category> categories = dto.getData();
-				mAdapter.setCategories(categories);
-			} else {
-				mAdapter.setCategories(null);
-				mActivity.getToast().show(R.string.get_data_fail);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			mAdapter.setCategories(null);
-			mActivity.getToast().show(mActivity.getResources().getText(R.string.service_fail) + response);
-		}
+
+	private void decodeCategoryListResponse(String response) {
+		@SuppressWarnings("unchecked")
+		List<Category> categories = (List<Category>) DecodeJsonResponseUtils.decode(response, TAG,
+				"decodeCategoryListResponse", mActivity.getToast(), mActivity, CategoryListDTO.class);
+		mAdapter.setCategories(categories);
 	}
-	private String getCategoryUrl() {
+
+	private String getCategoryListUrl() {
 		String url = Constant.BASE_URL + String.format("/api/v1/index/%d/big_indexs", mOperatorID);
-		if (mActivity.getType() == TargetListActivity.TYPE_INSPECT_SUPERVISE) {
-			url = Constant.BASE_URL + String.format("/api/v1/index/%s/%d/big_indexs", mDate, mOperatorID);
-		} else if (mActivity.getType() == TargetListActivity.TYPE_HISTORY) {
+		if (mActivity.getType() == TargetListActivity.TYPE_INSPECT_SUPERVISE
+				|| mActivity.getType() == TargetListActivity.TYPE_HISTORY) {
 			url = Constant.BASE_URL + String.format("/api/v1/index/%s/%d/big_indexs", mDate, mOperatorID);
 		}
-		Logger.debug(TAG, "getCategoryUrl -->  " + url);
+		Logger.debug(TAG, "getCategoryListUrl -->  " + url);
 		return url;
 	}
 
 	public void setDate(String date) {
 		mDate = date;
-		updateData();
+		updateCategoryList();
 	}
 
 }

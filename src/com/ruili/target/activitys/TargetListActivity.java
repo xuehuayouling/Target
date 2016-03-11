@@ -20,7 +20,7 @@ import com.ruili.target.fragments.DetailFragment;
 import com.ruili.target.fragments.MainFragment;
 import com.ruili.target.utils.Constant;
 import com.ruili.target.utils.DateUtils;
-import com.ruili.target.utils.JsonUtil;
+import com.ruili.target.utils.DecodeJsonResponseUtils;
 import com.ruili.target.utils.Logger;
 
 import android.app.DatePickerDialog;
@@ -29,9 +29,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
@@ -41,29 +39,31 @@ import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.PopupWindow;
-import android.widget.SearchView;
-import android.widget.SearchView.OnQueryTextListener;
 import android.widget.TextView;
 
-public class TargetListActivity extends BaseActivity implements OnClickListener, OnQueryTextListener {
+public class TargetListActivity extends BaseActivity implements OnClickListener {
 
-	public static final String TYPE_KEY = "type";
-	public static final int TYPE_TODAY = 0;
-	public static final int TYPE_HISTORY = 1;
-	public static final int TYPE_INSPECT_SUPERVISE = 2;
+	protected static final String TAG = TargetListActivity.class.getSimpleName();
 	private static final int SCAN_REQUEST_CODE = 1;
 	private RequestQueue mQueue;
 	private MainFragment mMainFragment;
 	private DetailFragment mDetailFragment;
 	private List<CheckTime> mCheckTimes;
 	// 今日指标、历史指标、监督管理
+	public static final String TYPE_KEY = "type";
+	public static final int TYPE_TODAY = 0;
+	public static final int TYPE_HISTORY = 1;
+	public static final int TYPE_INSPECT_SUPERVISE = 2;
 	private int mType;
 	private TextView mTVDate;
 	private TextView mTVEmployee;
-
 	public static final int OPETATOR_ID_INVALID = -1;
 	private int mOperatorID = OPETATOR_ID_INVALID;
 	private boolean firstResume = true;
+	private PopupWindow mTimeMenus;
+	private ArrayAdapter<CheckTime> mTimeMenuAdapter;
+	private PopupWindow mEmployeeMenus;
+	private ArrayAdapter<Employee> mEmployeeMenuAdapter;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -123,9 +123,9 @@ public class TargetListActivity extends BaseActivity implements OnClickListener,
 		mTVDate.setText(getDateString(new Date()));
 		mTVDate.setOnClickListener(this);
 		if (mType == TYPE_HISTORY || mType == TYPE_INSPECT_SUPERVISE) {
-			mTVDate.setVisibility(View.GONE);
-		} else {
 			mTVDate.setVisibility(View.VISIBLE);
+		} else {
+			mTVDate.setVisibility(View.GONE);
 		}
 	}
 
@@ -163,11 +163,12 @@ public class TargetListActivity extends BaseActivity implements OnClickListener,
 	}
 
 	public void onMainListItemClick(Category category) {
-		updateDetailsList(category.getId(), -1, mTVDate.getText().toString());
+		setCheckTimes(category.getChecktime());
+		updateDetailsList(category.getId(), CheckTime.CHECK_TIME_NULL, mTVDate.getText().toString());
 	}
 
 	private void updateDetailsList(int categoryId, int checktimeID, String date) {
-		mDetailFragment.updateData(categoryId, checktimeID, date);
+		mDetailFragment.updateSubcategoryList(categoryId, checktimeID, date);
 	}
 
 	@Override
@@ -205,9 +206,7 @@ public class TargetListActivity extends BaseActivity implements OnClickListener,
 				final String newDate = getDateString(new Date(year - 1900, month, dayOfMonth));
 				if (!mTVDate.getText().equals(newDate)) {
 					mTVDate.setText(newDate);
-					if (mType == TYPE_INSPECT_SUPERVISE || mType == TYPE_HISTORY) {
-						updateMainFragment();
-					}
+					updateMainFragment();
 				}
 			}
 
@@ -218,14 +217,8 @@ public class TargetListActivity extends BaseActivity implements OnClickListener,
 		dialog.show();
 	}
 
-	public void setCheckTimes(List<CheckTime> times) {
+	private void setCheckTimes(List<CheckTime> times) {
 		mCheckTimes = times;
-	}
-
-	@Override
-	public boolean onTouchEvent(MotionEvent event) {
-		dismissTimeMenus();
-		return super.onTouchEvent(event);
 	}
 
 	private void dismissTimeMenus() {
@@ -239,13 +232,6 @@ public class TargetListActivity extends BaseActivity implements OnClickListener,
 			mEmployeeMenus.dismiss();
 		}
 	}
-
-	private PopupWindow mTimeMenus;
-	private ArrayAdapter<CheckTime> mTimeMenuAdapter;
-	protected static final String TAG = TargetListActivity.class.getSimpleName();
-
-	private PopupWindow mEmployeeMenus;
-	private ArrayAdapter<Employee> mEmployeeMenuAdapter;
 
 	private void showOrHideEmployeeMenus() {
 		if (mEmployeeMenus != null && mEmployeeMenus.isShowing()) {
@@ -269,9 +255,9 @@ public class TargetListActivity extends BaseActivity implements OnClickListener,
 
 			@Override
 			public void onErrorResponse(VolleyError error) {
-				Logger.debug(TAG, "decodeBarcode fail -->  " + error.toString());
 				mProgressDialogUtils.cancel();
 				mToast.show(R.string.netword_fail);
+				Logger.debug(TAG, "getEmployeesAndShowMenu fail -->  " + error.toString());
 			}
 		});
 		mQueue.add(stringRequest);
@@ -279,23 +265,14 @@ public class TargetListActivity extends BaseActivity implements OnClickListener,
 	}
 
 	protected void decodeEmployeesAndShowMenu(String response) {
-		Log.d(TAG, response);
-		try {
-			EmployeeListDTO dto = JsonUtil.parseObject(response, EmployeeListDTO.class);
-			if (dto.isValid()) {
-				List<Employee> employees = dto.getData();
-				showEmployeeMenus(employees);
-			} else {
-				getToast().show(getString(R.string.get_data_fail) + response);
-			}
-		} catch (Exception e) {
-			getToast().show(getResources().getText(R.string.service_fail) + response);
-			e.printStackTrace();
-		}
+		@SuppressWarnings("unchecked")
+		List<Employee> employees = (List<Employee>) DecodeJsonResponseUtils.decode(response, TAG,
+				"decodeEmployeesAndShowMenu", getToast(), this, EmployeeListDTO.class);
+		showEmployeeMenus(employees);
 	}
 
 	private String getEmployeesUrl() {
-		return Constant.BASE_URL + "/api/v1/index/1/operators";
+		return Constant.BASE_URL + String.format("/api/v1/index/%d/operators", getUserOperatorID());
 	}
 
 	private void showOrHideTimeMenus() {
@@ -309,71 +286,73 @@ public class TargetListActivity extends BaseActivity implements OnClickListener,
 	private void showTimeMenus() {
 		if (mCheckTimes != null && mCheckTimes.size() > 0) {
 			if (mTimeMenus == null) {
-				LayoutInflater layoutInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-				View view = layoutInflater.inflate(R.layout.widget_list, null);
-				ListView lvMenus = (ListView) view.findViewById(R.id.lv_list);
-				if (mTimeMenuAdapter == null) {
-					mTimeMenuAdapter = new ArrayAdapter<>(this, R.layout.widget_simple_list_item);
-				}
-				mTimeMenuAdapter.clear();
-				mTimeMenuAdapter.addAll(mCheckTimes);
-				lvMenus.setAdapter(mTimeMenuAdapter);
-				lvMenus.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-					@Override
-					public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-						mDetailFragment.setCheckTimeID(mTimeMenuAdapter.getItem(position).getId());
-						dismissTimeMenus();
-					}
-				});
-				mTimeMenus = new PopupWindow(view, getResources().getDimensionPixelSize(R.dimen.popup_menu_width),
-						LayoutParams.WRAP_CONTENT);
-				mTimeMenus.setBackgroundDrawable(new BitmapDrawable());
-				mTimeMenus.setFocusable(true);
-				mTimeMenus.setOutsideTouchable(true);
-				mTimeMenus.update();
-			} else {
-				mTimeMenuAdapter.clear();
-				mTimeMenuAdapter.addAll(mCheckTimes);
+				initTimeMenu();
 			}
+			mTimeMenuAdapter.clear();
+			mTimeMenuAdapter.addAll(mCheckTimes);
 			mTimeMenus.showAsDropDown(findViewById(R.id.iv_menu), 10, 10);
 		}
+	}
+
+	private void initTimeMenu() {
+		LayoutInflater layoutInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		View view = layoutInflater.inflate(R.layout.widget_list, null);
+		ListView lvMenus = (ListView) view.findViewById(R.id.lv_list);
+		if (mTimeMenuAdapter == null) {
+			mTimeMenuAdapter = new ArrayAdapter<>(this, R.layout.widget_simple_list_item);
+		}
+		lvMenus.setAdapter(mTimeMenuAdapter);
+		lvMenus.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				mDetailFragment.setCheckTimeID(mTimeMenuAdapter.getItem(position).getId());
+				dismissTimeMenus();
+			}
+		});
+		mTimeMenus = new PopupWindow(view, getResources().getDimensionPixelSize(R.dimen.popup_menu_width),
+				LayoutParams.WRAP_CONTENT);
+		mTimeMenus.setBackgroundDrawable(new BitmapDrawable());
+		mTimeMenus.setFocusable(true);
+		mTimeMenus.setOutsideTouchable(true);
+		mTimeMenus.update();
 	}
 
 	private void showEmployeeMenus(List<Employee> employees) {
 		if (employees != null && employees.size() > 0) {
 			if (mEmployeeMenus == null) {
-				LayoutInflater layoutInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-				View view = layoutInflater.inflate(R.layout.widget_list, null);
-				ListView lvMenus = (ListView) view.findViewById(R.id.lv_list);
-				if (mEmployeeMenuAdapter == null) {
-					mEmployeeMenuAdapter = new ArrayAdapter<>(this, R.layout.widget_simple_list_item);
-				}
-				mEmployeeMenuAdapter.clear();
-				mEmployeeMenuAdapter.addAll(employees);
-				lvMenus.setAdapter(mEmployeeMenuAdapter);
-				lvMenus.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-					@Override
-					public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-						mOperatorID = mEmployeeMenuAdapter.getItem(position).getOperator_id();
-						updateMainFragment();
-						mTVEmployee.setText(mEmployeeMenuAdapter.getItem(position).getName());
-						dismissEmployeeMenus();
-					}
-				});
-				mEmployeeMenus = new PopupWindow(view, getResources().getDimensionPixelSize(R.dimen.popup_menu_width),
-						LayoutParams.WRAP_CONTENT);
-				mEmployeeMenus.setBackgroundDrawable(new BitmapDrawable());
-				mEmployeeMenus.setFocusable(true);
-				mEmployeeMenus.setOutsideTouchable(true);
-				mEmployeeMenus.update();
-			} else {
-				mEmployeeMenuAdapter.clear();
-				mEmployeeMenuAdapter.addAll(employees);
+				initEmployeeMenu();
 			}
+			mEmployeeMenuAdapter.clear();
+			mEmployeeMenuAdapter.addAll(employees);
 			mEmployeeMenus.showAsDropDown(findViewById(R.id.tv_employee), 10, 10);
 		}
+	}
+
+	private void initEmployeeMenu() {
+		LayoutInflater layoutInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		View view = layoutInflater.inflate(R.layout.widget_list, null);
+		ListView lvMenus = (ListView) view.findViewById(R.id.lv_list);
+		if (mEmployeeMenuAdapter == null) {
+			mEmployeeMenuAdapter = new ArrayAdapter<>(this, R.layout.widget_simple_list_item);
+		}
+		lvMenus.setAdapter(mEmployeeMenuAdapter);
+		lvMenus.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				mOperatorID = mEmployeeMenuAdapter.getItem(position).getOperator_id();
+				updateMainFragment();
+				mTVEmployee.setText(mEmployeeMenuAdapter.getItem(position).getName());
+				dismissEmployeeMenus();
+			}
+		});
+		mEmployeeMenus = new PopupWindow(view, getResources().getDimensionPixelSize(R.dimen.popup_menu_width),
+				LayoutParams.WRAP_CONTENT);
+		mEmployeeMenus.setBackgroundDrawable(new BitmapDrawable());
+		mEmployeeMenus.setFocusable(true);
+		mEmployeeMenus.setOutsideTouchable(true);
+		mEmployeeMenus.update();
 	}
 
 	public int getOperatorId() {
@@ -389,29 +368,27 @@ public class TargetListActivity extends BaseActivity implements OnClickListener,
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (resultCode == RESULT_OK && requestCode == SCAN_REQUEST_CODE) {
 			String barcode = data.getStringExtra("codeString");
-			decodeBarcode(barcode);
+			decodeBarcodeFromNetWork(barcode);
 		}
 	}
 
-	private void decodeBarcode(String barcode) {
+	private void decodeBarcodeFromNetWork(String barcode) {
 		mProgressDialogUtils.show();
 		StringRequest stringRequest = new StringRequest(Method.GET, getBarcodeUrl(barcode),
 				new Response.Listener<String>() {
 
 					@Override
 					public void onResponse(String response) {
-						Logger.debug(TAG, "decodeBarcode success -->  " + response);
 						mProgressDialogUtils.cancel();
-						mOperatorID = getUserOperatorID();
 						updateMainFragment();
 					}
 				}, new Response.ErrorListener() {
 
 					@Override
 					public void onErrorResponse(VolleyError error) {
-						Logger.debug(TAG, "decodeBarcode fail -->  " + error.toString());
 						mProgressDialogUtils.cancel();
 						mToast.show(R.string.netword_fail);
+						Logger.debug(TAG, "decodeBarcodeFromNetWork fail -->  " + error.toString());
 					}
 				});
 		mQueue.add(stringRequest);
@@ -424,18 +401,6 @@ public class TargetListActivity extends BaseActivity implements OnClickListener,
 	private void updateMainFragment() {
 		mDetailFragment.clear();
 		mMainFragment.setParams(mTVDate.getText().toString(), mOperatorID);
-	}
-
-	@Override
-	public boolean onQueryTextSubmit(String query) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean onQueryTextChange(String newText) {
-		// TODO Auto-generated method stub
-		return false;
 	}
 
 }

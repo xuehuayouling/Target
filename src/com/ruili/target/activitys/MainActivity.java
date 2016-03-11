@@ -9,7 +9,6 @@ import android.content.SharedPreferences;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
@@ -58,15 +57,6 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 		}
 	}
 
-	@Override
-	public boolean onTouchEvent(MotionEvent event) {
-		if (mPopupWindow != null && mPopupWindow.isShowing()) {
-			mPopupWindow.dismiss();
-			mPopupWindow = null;
-		}
-		return super.onTouchEvent(event);
-	}
-
 	private void clearUserInfo() {
 		SharedPreferences mySharedPreferences = getSharedPreferences(User.SHAREDPREFERENCES_KEY, Activity.MODE_PRIVATE);
 		SharedPreferences.Editor editor = mySharedPreferences.edit();
@@ -87,7 +77,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 			showTargetListActivity(TargetListActivity.TYPE_INSPECT_SUPERVISE);
 			break;
 		case R.id.imgbtn_settings:
-			showOrHideTimeMenus();
+			showOrHideSettingsMenu();
 			break;
 		default:
 			break;
@@ -100,40 +90,42 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 		startActivity(intent);
 	}
 
-	private void showOrHideTimeMenus() {
+	private void showOrHideSettingsMenu() {
 		if (mPopupWindow != null && mPopupWindow.isShowing()) {
-			dismissTimeMenus();
+			dismissSettingsMenu();
 		} else {
-			showTimeMenus();
+			showSettingsMenu();
 		}
 	}
 
-	private void dismissTimeMenus() {
+	private void dismissSettingsMenu() {
 		if (mPopupWindow != null && mPopupWindow.isShowing()) {
 			mPopupWindow.dismiss();
 		}
 	}
 
-	private void showTimeMenus() {
+	private void showSettingsMenu() {
 		if (mPopupWindow == null) {
-			View view = LayoutInflater.from(this).inflate(R.layout.widget_quit, null);
-			view.setOnClickListener(new OnClickListener() {
-
-				@Override
-				public void onClick(View arg0) {
-					dismissTimeMenus();
-					clearUserInfo();
-					showLoginActivity();
-				}
-			});
-			mPopupWindow = new PopupWindow(view, LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-			mPopupWindow.setBackgroundDrawable(new BitmapDrawable());
-			mPopupWindow.setFocusable(true);
-			mPopupWindow.setOutsideTouchable(true);
-			mPopupWindow.update();
-			mPopupWindow.showAsDropDown(findViewById(R.id.imgbtn_settings), 10, 10);
-		} else {
-			mPopupWindow.showAsDropDown(findViewById(R.id.imgbtn_settings), 10, 10);
+			initSettingsMenu();
 		}
+		mPopupWindow.showAsDropDown(findViewById(R.id.imgbtn_settings), 10, 10);
+	}
+
+	private void initSettingsMenu() {
+		View view = LayoutInflater.from(this).inflate(R.layout.widget_quit, null);
+		view.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View arg0) {
+				dismissSettingsMenu();
+				clearUserInfo();
+				showLoginActivity();
+			}
+		});
+		mPopupWindow = new PopupWindow(view, LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+		mPopupWindow.setBackgroundDrawable(new BitmapDrawable());
+		mPopupWindow.setFocusable(true);
+		mPopupWindow.setOutsideTouchable(true);
+		mPopupWindow.update();
 	}
 }

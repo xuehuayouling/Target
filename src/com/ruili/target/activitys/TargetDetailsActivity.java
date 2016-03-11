@@ -16,9 +16,11 @@ import com.android.volley.toolbox.Volley;
 import com.ruili.target.R;
 import com.ruili.target.adapters.ImageAdapter;
 import com.ruili.target.entity.PicUrl;
+import com.ruili.target.entity.ResponseDTO;
 import com.ruili.target.entity.Subcategory;
 import com.ruili.target.entity.SubcategoryDTO;
 import com.ruili.target.utils.Constant;
+import com.ruili.target.utils.DecodeJsonResponseUtils;
 import com.ruili.target.utils.IQiniuUploadManagerListener;
 import com.ruili.target.utils.ImageTool;
 import com.ruili.target.utils.JsonUtil;
@@ -28,7 +30,6 @@ import com.ruili.target.utils.TextUtil;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -37,7 +38,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
@@ -60,18 +60,15 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 	private RadioGroup mRGState;
 	private RatingBar mRBarScore;
 	private EditText mETRemark;
-	private TextView mTVRemark;
 	private EditText mETComment;
-	private TextView mTVComment;
 	private Gallery mGlpics;
-	private LayoutInflater mInflater;
 	private ImageAdapter mImageAdapter;
 	private List<String> mPicPaths = new ArrayList<>();
 	protected static final String TAG = TargetDetailsActivity.class.getSimpleName();
 	private RequestQueue mQueue;
 	// 今日指标、历史指标、监督管理
 	private int mType;
-	
+
 	private static final int SATISFACTION_GOOD = 0;
 	private static final int SATISFACTION_NORMAL = 1;
 	private static final int SATISFACTION_BAD = 2;
@@ -81,28 +78,29 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		mType = getIntent().getIntExtra(KEY_TYPE, -1);
 		setContentView(R.layout.activity_target_details);
 		initRequestQueue();
-		mInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		initView();
 	}
 
 	private void initView() {
-		mType = getIntent().getIntExtra(KEY_TYPE, -1);
-		ImageView imgVTakePhoto = (ImageView) findViewById(R.id.imgv_take_photo);
-		imgVTakePhoto.setOnClickListener(this);
-		TextView tvSave = (TextView) findViewById(R.id.tv_save);
-		tvSave.setOnClickListener(this);
-		mTVTitle = (TextView) findViewById(R.id.tv_title);
-		mRGState = (RadioGroup) findViewById(R.id.rg_state);
-		mRBarScore = (RatingBar) findViewById(R.id.rbar_score);
-		mETRemark = (EditText) findViewById(R.id.et_remark);
-		mTVRemark = (TextView) findViewById(R.id.tv_remark);
-		ImageView ivBack = (ImageView) findViewById(R.id.iv_back);
-		ivBack.setOnClickListener(this);
-		mGlpics = (Gallery) findViewById(R.id.ll_pics);
+		initImageViewBack();
+		initTextViewSave();
+		initTextViewTitle();
+		initRatingBarScore();
+		initRadiGroupState();
+		initEditTextRemark();
+		initGalleryPics();
+		initImageViewTakePhoto();
+		initLinearLayoutComment();
+		initButtonsSatisfaction();
+		initEditTextComment();
+	}
+
+	private void initGalleryPics() {
 		mImageAdapter = new ImageAdapter(this, null);
-		mPicPaths.clear();
+		mGlpics = (Gallery) findViewById(R.id.ll_pics);
 		mGlpics.setAdapter(mImageAdapter);
 		mGlpics.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
@@ -125,7 +123,6 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
-							// TODO Auto-generated method stub
 
 						}
 					}).setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
@@ -143,33 +140,117 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 				}
 			}
 		});
+	}
+
+	private void initButtonsSatisfaction() {
 		Button btnSatisfactionGood = (Button) findViewById(R.id.btn_satisfaction_good);
 		Button btnSatisfactionNormal = (Button) findViewById(R.id.btn_satisfaction_normal);
 		Button btnSatisfactionBad = (Button) findViewById(R.id.btn_satisfaction_bad);
 		btnSatisfactionGood.setOnClickListener(this);
 		btnSatisfactionNormal.setOnClickListener(this);
 		btnSatisfactionBad.setOnClickListener(this);
-		mETComment = (EditText) findViewById(R.id.et_comment);
-		mTVComment = (TextView) findViewById(R.id.tv_comment);
-		if (mType == TargetListActivity.TYPE_INSPECT_SUPERVISE || mType == TargetListActivity.TYPE_HISTORY) {
-			for (int i = 0; i < mRGState.getChildCount(); i++) {
-				mRGState.getChildAt(i).setEnabled(false);
-			}
-			mRBarScore.setEnabled(false);
-			mTVRemark.setVisibility(View.VISIBLE);
-			mETRemark.setVisibility(View.GONE);
-			imgVTakePhoto.setVisibility(View.GONE);
-		}
-		if (mType == TargetListActivity.TYPE_HISTORY) {
-			tvSave.setVisibility(View.GONE);
+		if (mType == TargetListActivity.TYPE_INSPECT_SUPERVISE) {
+			btnSatisfactionGood.setClickable(true);
+			btnSatisfactionNormal.setClickable(true);
+			btnSatisfactionBad.setClickable(true);
+		} else {
 			btnSatisfactionGood.setClickable(false);
 			btnSatisfactionNormal.setClickable(false);
 			btnSatisfactionBad.setClickable(false);
-			mTVComment.setVisibility(View.VISIBLE);
-			mETComment.setVisibility(View.GONE);
 		}
+	}
+
+	private void initLinearLayoutComment() {
+		View view = findViewById(R.id.ll_comment);
+		if (mType == TargetListActivity.TYPE_HISTORY || mType == TargetListActivity.TYPE_INSPECT_SUPERVISE) {
+			view.setVisibility(View.VISIBLE);
+		} else {
+			view.setVisibility(View.GONE);
+		}
+	}
+
+	private void initEditTextComment() {
+		mETComment = (EditText) findViewById(R.id.et_comment);
+		if (mType == TargetListActivity.TYPE_INSPECT_SUPERVISE) {
+			mETComment.setEnabled(true);
+		} else {
+			mETComment.setEnabled(false);
+		}
+	}
+
+	private void initImageViewBack() {
+		ImageView ivBack = (ImageView) findViewById(R.id.iv_back);
+		ivBack.setOnClickListener(this);
+	}
+
+	private void initEditTextRemark() {
+		mETRemark = (EditText) findViewById(R.id.et_remark);
 		if (mType == TargetListActivity.TYPE_TODAY) {
-			findViewById(R.id.ll_comment).setVisibility(View.GONE);
+			mETRemark.setEnabled(true);
+		} else {
+			mETRemark.setEnabled(false);
+		}
+	}
+
+	private void initRatingBarScore() {
+		mRBarScore = (RatingBar) findViewById(R.id.rbar_score);
+		if (mType == TargetListActivity.TYPE_TODAY) {
+			mRBarScore.setEnabled(true);
+		} else {
+			mRBarScore.setEnabled(false);
+		}
+	}
+
+	private void initRadiGroupState() {
+		mRGState = (RadioGroup) findViewById(R.id.rg_state);
+		mRGState.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+			
+			@Override
+			public void onCheckedChanged(RadioGroup group, int checkedId) {
+				switch (checkedId) {
+				case R.id.rbtn_yes:
+					mSubcategory.setIndex_complete(Subcategory.INDEX_COMPLETE_YES);
+					break;
+				case R.id.rbtn_no:
+					mSubcategory.setIndex_complete(Subcategory.INDEX_COMPLETE_NO);
+					break;
+				default:
+					break;
+				}
+			}
+		});
+		if (mType == TargetListActivity.TYPE_TODAY) {
+			for (int i = 0; i < mRGState.getChildCount(); i++) {
+				mRGState.getChildAt(i).setEnabled(true);
+			}
+		} else {
+			for (int i = 0; i < mRGState.getChildCount(); i++) {
+				mRGState.getChildAt(i).setEnabled(false);
+			}
+		}
+	}
+
+	private void initTextViewTitle() {
+		mTVTitle = (TextView) findViewById(R.id.tv_title);
+	}
+
+	private void initTextViewSave() {
+		TextView tvSave = (TextView) findViewById(R.id.tv_save);
+		tvSave.setOnClickListener(this);
+		if (mType == TargetListActivity.TYPE_TODAY || mType == TargetListActivity.TYPE_INSPECT_SUPERVISE) {
+			tvSave.setVisibility(View.VISIBLE);
+		} else {
+			tvSave.setVisibility(View.GONE);
+		}
+	}
+
+	private void initImageViewTakePhoto() {
+		ImageView imgVTakePhoto = (ImageView) findViewById(R.id.imgv_take_photo);
+		imgVTakePhoto.setOnClickListener(this);
+		if (mType == TargetListActivity.TYPE_TODAY) {
+			imgVTakePhoto.setVisibility(View.VISIBLE);
+		} else {
+			imgVTakePhoto.setVisibility(View.GONE);
 		}
 	}
 
@@ -199,48 +280,37 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 	@Override
 	protected void onResume() {
 		super.onResume();
-		update();
-	}
-
-	private void update() {
 		if (mSubcategory == null) {
-			getProgressDialogUtils().show("");
-			StringRequest stringRequest = new StringRequest(Method.GET,
-					getSubCategoryUrl(getIntent().getIntExtra(KEY_SUBCATEGORY, -1)), new Response.Listener<String>() {
-
-						@Override
-						public void onResponse(String response) {
-							Logger.debug(TAG, "update success -->  " + response);
-							getProgressDialogUtils().cancel();
-							decodeResponse(response);
-						}
-					}, new Response.ErrorListener() {
-
-						@Override
-						public void onErrorResponse(VolleyError error) {
-							Logger.debug(TAG, "update fail -->  " + error.toString());
-							getProgressDialogUtils().cancel();
-							getToast().show(R.string.netword_fail);
-						}
-					});
-			mQueue.add(stringRequest);
+			loadSubcategory();
 		}
 	}
 
-	private void decodeResponse(String response) {
-		Log.d(TAG, response);
-		try {
-			SubcategoryDTO dto = JsonUtil.parseObject(response, SubcategoryDTO.class);
-			if (dto.isValid()) {
-				mSubcategory = dto.getData();
-				refreshView();
-			} else {
-				getToast().show(R.string.get_data_fail);
-			}
-		} catch (Exception e) {
-			getToast().show(getResources().getText(R.string.service_fail) + response);
-			e.printStackTrace();
-		}
+	private void loadSubcategory() {
+		getProgressDialogUtils().show("");
+		StringRequest stringRequest = new StringRequest(Method.GET,
+				getSubCategoryUrl(getIntent().getIntExtra(KEY_SUBCATEGORY, -1)), new Response.Listener<String>() {
+
+					@Override
+					public void onResponse(String response) {
+						getProgressDialogUtils().cancel();
+						decodeSubcategoryResponse(response);
+					}
+				}, new Response.ErrorListener() {
+
+					@Override
+					public void onErrorResponse(VolleyError error) {
+						getProgressDialogUtils().cancel();
+						getToast().show(R.string.netword_fail);
+						Logger.debug(TAG, "loadSubcategory fail -->  " + error.toString());
+					}
+				});
+		mQueue.add(stringRequest);
+	}
+
+	private void decodeSubcategoryResponse(String response) {
+		mSubcategory = (Subcategory) DecodeJsonResponseUtils.decode(response, TAG, "decodeSubcategoryResponse",
+				getToast(), this, SubcategoryDTO.class);
+		refreshView();
 	}
 
 	private void refreshView() {
@@ -260,30 +330,12 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 				} else {
 					mRGState.clearCheck();
 				}
-				mRGState.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-
-					@Override
-					public void onCheckedChanged(RadioGroup group, int checkedId) {
-						switch (checkedId) {
-						case R.id.rbtn_yes:
-							mSubcategory.setIndex_complete(Subcategory.INDEX_COMPLETE_YES);
-							break;
-						case R.id.rbtn_no:
-							mSubcategory.setIndex_complete(Subcategory.INDEX_COMPLETE_NO);
-							break;
-						default:
-							break;
-						}
-					}
-				});
 			}
 			mETRemark.setText(mSubcategory.getIndex_remark());
-			mTVRemark.setText(mSubcategory.getIndex_remark());
 			mETComment.setText(mSubcategory.getQc_describe());
-			mTVComment.setText(mSubcategory.getQc_describe());
 			try {
 				int qc_state = Integer.valueOf(mSubcategory.getQc_state());
-				updateSatisfactionBtn(qc_state);
+				updateSatisfactionBtns(qc_state);
 			} catch (NumberFormatException e) {
 				e.printStackTrace();
 			}
@@ -353,8 +405,8 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 			break;
 		}
 	}
-	
-	private void updateSatisfactionBtn(int state) {
+
+	private void updateSatisfactionBtns(int state) {
 		switch (state) {
 		case SATISFACTION_GOOD:
 			mSatisfaction = state;
@@ -380,24 +432,38 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 			startSaveSubcategoryByDirector();
 		}
 	}
+
 	private void startSaveSubcategoryBySuperintendent() {
 		getProgressDialogUtils().show();
 		StringRequest stringRequest = new StringRequest(Method.PUT,
-				getUpdateSubCategoryUrlBySuperintendent(mSubcategory.getIndex_log_id()), new Response.Listener<String>() {
+				getUpdateSubCategoryUrlBySuperintendent(mSubcategory.getIndex_log_id()),
+				new Response.Listener<String>() {
 
 					@Override
 					public void onResponse(String response) {
 						getProgressDialogUtils().cancel();
-						Logger.debug(TAG, "startSaveSubcategoryBySuperintendent success -->  " + response);
-						finish();
+						Log.d(TAG, "startSaveSubcategoryBySuperintendent" + " --> " + response);
+						try {
+							ResponseDTO dto = JsonUtil.parseObject(response, ResponseDTO.class);
+							if (dto.isValid()) {
+								finish();
+							} else {
+								getToast().show(getString(R.string.save_fail));
+								Logger.debug(TAG,  "startSaveSubcategoryBySuperintendent" + " --> " + getString(R.string.save_fail) + response);
+							}
+						} catch (Exception e) {
+							getToast().show(getString(R.string.service_fail));
+							e.printStackTrace();
+							Logger.debug(TAG, "startSaveSubcategoryBySuperintendent" + " --> " + getString(R.string.can_not_decode_data) + response);
+						}
 					}
 				}, new Response.ErrorListener() {
 
 					@Override
 					public void onErrorResponse(VolleyError error) {
-						Logger.debug(TAG, "save fail -->  " + error.toString());
 						getProgressDialogUtils().cancel();
 						getToast().show(R.string.netword_fail);
+						Logger.debug(TAG, "startSaveSubcategoryBySuperintendent fail -->  " + error.toString());
 					}
 				}) {
 
@@ -449,6 +515,7 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 					public void onMultipleUploadFail(String reason) {
 						getProgressDialogUtils().cancel();
 						getToast().show(getString(R.string.netword_fail) + reason);
+						Log.d(TAG, "onMultipleUploadFail" + " --> " + reason);
 					}
 
 					@Override
@@ -486,16 +553,28 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 					@Override
 					public void onResponse(String response) {
 						getProgressDialogUtils().cancel();
-						Logger.debug(TAG, "save success -->  " + response);
-						finish();
+						Log.d(TAG, "startSaveSubcategoryByDirector" + " --> " + response);
+						try {
+							ResponseDTO dto = JsonUtil.parseObject(response, ResponseDTO.class);
+							if (dto.isValid()) {
+								finish();
+							} else {
+								getToast().show(getString(R.string.save_fail));
+								Logger.debug(TAG,  "startSaveSubcategoryByDirector" + " --> " + getString(R.string.save_fail) + response);
+							}
+						} catch (Exception e) {
+							getToast().show(getString(R.string.service_fail));
+							e.printStackTrace();
+							Logger.debug(TAG, "startSaveSubcategoryByDirector" + " --> " + getString(R.string.can_not_decode_data) + response);
+						}
 					}
 				}, new Response.ErrorListener() {
 
 					@Override
 					public void onErrorResponse(VolleyError error) {
-						Logger.debug(TAG, "save fail -->  " + error.toString());
 						getProgressDialogUtils().cancel();
 						getToast().show(R.string.netword_fail);
+						Logger.debug(TAG, "startSaveSubcategoryByDirector fail -->  " + error.toString());
 					}
 				}) {
 
@@ -513,51 +592,12 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 		Logger.debug(TAG, "getUpdateSubCategoryUrl -->  " + url);
 		return url;
 	}
-	
+
 	private String getUpdateSubCategoryUrlBySuperintendent(int indexLogId) {
 		String url = Constant.BASE_URL + String.format("/api/v1/index/%d/index_log_qc", indexLogId);
 		Logger.debug(TAG, "getUpdateSubCategoryUrl -->  " + url);
 		return url;
 	}
-
-	// private void uploadImage(final int id) {
-	// if (mNeedUploadPicPaths.size() > id) {
-	// String path = mNeedUploadPicPaths.get(id);
-	// Logger.debug(TAG, "uploadImage --> picPath: " + path);
-	// getProgressDialogUtils().show();
-	// QiniuUploadUitls.getInstance().uploadImage(getBitmap(path), new
-	// IQiniuUploadUitlsListener() {
-	//
-	// @Override
-	// public void onSucess(String fileUrl) {
-	// Logger.debug(TAG, fileUrl);
-	// getProgressDialogUtils().cancel();
-	// List<PicUrl> picUrls = mSubcategory.getIndex_pic();
-	// if (picUrls == null) {
-	// picUrls = new ArrayList<>();
-	// }
-	// PicUrl picUrl = new PicUrl();
-	// picUrl.setPic_url(fileUrl);
-	// picUrls.add(picUrl);
-	// mSubcategory.setIndex_pic(picUrls);
-	// uploadImage(id + 1);
-	// }
-	//
-	// @Override
-	// public void onProgress(int progress) {
-	//
-	// }
-	//
-	// @Override
-	// public void onError(int errorCode, String msg) {
-	// getProgressDialogUtils().cancel();
-	// getToast().show(getString(R.string.netword_fail) + msg);
-	// }
-	// });
-	// } else {
-	// save();
-	// }
-	// }
 
 	private Bitmap getBitmap(String picPath) {
 		return ImageTool.compressBitmap(picPath, 320, 240);

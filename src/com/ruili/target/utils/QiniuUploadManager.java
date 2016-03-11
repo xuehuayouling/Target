@@ -35,6 +35,7 @@ public class QiniuUploadManager {
 	}
 
 	/**
+	 * 多文件同时上传，如果都上传成功，则返回成功，否则返回失败
 	 * @param files
 	 *            map包含需要上传到服务器的文件路径（key:{@link #KEY_FILE_PATH}
 	 *            }），和保存到服务器的名称（key:{@link #KEY_SAVE_NAME}， PS:无需包含服务器地址）

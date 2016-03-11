@@ -14,13 +14,12 @@ import com.ruili.target.entity.CheckTime;
 import com.ruili.target.entity.Subcategory;
 import com.ruili.target.entity.SubcategoryListDTO;
 import com.ruili.target.utils.Constant;
-import com.ruili.target.utils.JsonUtil;
+import com.ruili.target.utils.DecodeJsonResponseUtils;
 import com.ruili.target.utils.Logger;
 
 import android.app.ListFragment;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,6 +32,7 @@ public class DetailFragment extends ListFragment {
 	private int mCategoryId = -1;
 	private int mCheckTimeId = CheckTime.CHECK_TIME_NULL;
 	private String mDate;
+
 	public void setActivity(TargetListActivity activity) {
 		this.mActivity = activity;
 	}
@@ -58,32 +58,27 @@ public class DetailFragment extends ListFragment {
 		this.setListAdapter(mAdapter);
 	}
 
-	public void updateData(int categoryId, int checktimeID, String date) {
+	public void updateSubcategoryList(int categoryId, int checktimeID, String date) {
 		mCategoryId = categoryId;
 		mCheckTimeId = checktimeID;
 		mDate = date;
-		reloadData();
+		loadSubcategoryList();
 	}
-	
-	public void setDate(String date) {
-		mDate = date;
-		reloadData();
-	}
-	
+
 	public void setCheckTimeID(int checkTimeID) {
 		mCheckTimeId = checkTimeID;
-		reloadData();
+		loadSubcategoryList();
 	}
-	
+
 	@Override
 	public void onResume() {
 		super.onResume();
 		if (mCategoryId != -1) {
-			reloadData();
+			loadSubcategoryList();
 		}
 	}
 
-	private void reloadData() {
+	private void loadSubcategoryList() {
 		if (mCategoryId == -1 || mActivity.getUserOperatorID() < 1) {
 			return;
 		}
@@ -93,43 +88,32 @@ public class DetailFragment extends ListFragment {
 
 					@Override
 					public void onResponse(String response) {
-						Logger.debug(TAG, "reloadData success -->   " + response);
 						mActivity.getProgressDialogUtils().cancel();
-						decodeResponse(response);
+						decodeSubcategoryListResponse(response);
 					}
 				}, new Response.ErrorListener() {
 
 					@Override
 					public void onErrorResponse(VolleyError error) {
-						Logger.debug(TAG, "reloadData fail -->   " + error.toString());
 						mActivity.getProgressDialogUtils().cancel();
 						mActivity.getToast().show(R.string.netword_fail);
+						Logger.debug(TAG, "loadSubcategoryList fail -->   " + error.toString());
 					}
 				});
 		mActivity.getRequestQueue().add(stringRequest);
 	}
- 
+
 	public void clear() {
 		mAdapter.setSubcategories(null);
 	}
-	private void decodeResponse(String response) {
-		Log.d(TAG, response);
-		try {
-			SubcategoryListDTO dto = JsonUtil.parseObject(response, SubcategoryListDTO.class);
-			if (dto.isValid()) {
-				List<Subcategory> subcategories = dto.getData();
-				mAdapter.setSubcategories(subcategories);
-			} else {
-				mAdapter.setSubcategories(null);
-				mActivity.getToast().show(mActivity.getString(R.string.get_data_fail) + response);
-			}
-		} catch (Exception e) {
-			mAdapter.setSubcategories(null);
-			mActivity.getToast().show(mActivity.getResources().getText(R.string.service_fail) + response);
-			e.printStackTrace();
-		}
+
+	@SuppressWarnings("unchecked")
+	private void decodeSubcategoryListResponse(String response) {
+		List<Subcategory> subcategories = (List<Subcategory>) DecodeJsonResponseUtils.decode(response, TAG,
+				"decodeSubcategoryListResponse", mActivity.getToast(), mActivity, SubcategoryListDTO.class);
+		mAdapter.setSubcategories(subcategories);
 	}
-	
+
 	private String getSubCategoryUrl() {
 		String checktime = String.valueOf(mCheckTimeId);
 		if (CheckTime.CHECK_TIME_NULL == mCheckTimeId) {
@@ -139,8 +123,8 @@ public class DetailFragment extends ListFragment {
 		if (mActivity.getType() == TargetListActivity.TYPE_INSPECT_SUPERVISE) {
 			operatoryId = mActivity.getOperatorId();
 		}
-		String url = Constant.BASE_URL + String.format("/api/v1/index/%d/%d/%s/%s/small_indexs",
-				mCategoryId, operatoryId, checktime, mDate);
+		String url = Constant.BASE_URL
+				+ String.format("/api/v1/index/%d/%d/%s/%s/small_indexs", mCategoryId, operatoryId, checktime, mDate);
 		Logger.debug(TAG, "getSubCategoryUrl -->  " + url);
 		return url;
 	}

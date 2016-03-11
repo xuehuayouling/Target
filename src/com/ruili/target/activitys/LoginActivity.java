@@ -79,17 +79,16 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 
 						@Override
 						public void onResponse(String response) {
-							Logger.debug(TAG, "login success -->  " + response);
 							mProgressDialogUtils.cancel();
-							decodeResponse(response);
+							decodeUserResponse(response);
 						}
 					}, new Response.ErrorListener() {
 
 						@Override
 						public void onErrorResponse(VolleyError error) {
-							Logger.debug(TAG, "login fail -->  " + error.toString());
 							mProgressDialogUtils.cancel();
 							mToast.show(R.string.netword_fail);
+							Logger.debug(TAG, "login fail -->  " + error.toString());
 						}
 					}) {
 
@@ -110,8 +109,8 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 		return Constant.USER_LOGIN;
 	}
 
-	private void decodeResponse(String response) {
-		Logger.debug(TAG, response);
+	private void decodeUserResponse(String response) {
+		Logger.debug(TAG, "decodeUserResponse -- >" + response);
 		try {
 			UserDTO dto = JsonUtil.parseObject(response, UserDTO.class);
 			if (dto.isValid()) {
@@ -120,10 +119,12 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 				showMainActivity();
 			} else {
 				mToast.show(R.string.valid_user_or_password);
+				Logger.debug(TAG,  "decodeUserResponse" + " --> " + getString(R.string.no_valid_data) + response);				
 			}
 		} catch (Exception e) {
 			mToast.show(getText(R.string.service_fail) + response);
 			e.printStackTrace();
+			Logger.debug(TAG, "decodeUserResponse" + " --> " + getString(R.string.can_not_decode_data) + response);
 		}
 	}
 

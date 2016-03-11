@@ -2,7 +2,7 @@ package com.ruili.target.entity;
 
 import java.util.List;
 
-public class CategoryDTO extends ResponseDTO {
+public class CategoryListDTO extends ResponseDTO {
 
 	private List<Category> data;
 
