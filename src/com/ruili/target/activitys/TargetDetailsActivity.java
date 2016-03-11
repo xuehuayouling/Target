@@ -17,6 +17,7 @@ import com.ruili.target.R;
 import com.ruili.target.adapters.ImageAdapter;
 import com.ruili.target.entity.PicUrl;
 import com.ruili.target.entity.ResponseDTO;
+import com.ruili.target.entity.SimpleResultDTO;
 import com.ruili.target.entity.Subcategory;
 import com.ruili.target.entity.SubcategoryDTO;
 import com.ruili.target.utils.Constant;
@@ -73,7 +74,6 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 	private static final int SATISFACTION_NORMAL = 1;
 	private static final int SATISFACTION_BAD = 2;
 	private int mSatisfaction = -1;
-	private List<String> mNeedUploadPicPaths;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -173,8 +173,10 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 		mETComment = (EditText) findViewById(R.id.et_comment);
 		if (mType == TargetListActivity.TYPE_INSPECT_SUPERVISE) {
 			mETComment.setEnabled(true);
+			mETComment.setFocusable(true);
 		} else {
 			mETComment.setEnabled(false);
+			mETComment.setFocusable(false);
 		}
 	}
 
@@ -187,8 +189,10 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 		mETRemark = (EditText) findViewById(R.id.et_remark);
 		if (mType == TargetListActivity.TYPE_TODAY) {
 			mETRemark.setEnabled(true);
+			mETRemark.setFocusable(true);
 		} else {
 			mETRemark.setEnabled(false);
+			mETRemark.setFocusable(false);
 		}
 	}
 
@@ -444,7 +448,7 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 						getProgressDialogUtils().cancel();
 						Log.d(TAG, "startSaveSubcategoryBySuperintendent" + " --> " + response);
 						try {
-							ResponseDTO dto = JsonUtil.parseObject(response, ResponseDTO.class);
+							ResponseDTO dto = JsonUtil.parseObject(response, SimpleResultDTO.class);
 							if (dto.isValid()) {
 								finish();
 							} else {
@@ -485,10 +489,10 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 		mSubcategory.setIndex_pic(null);
 		Logger.debug(TAG, "uploadImage -->  mPicPaths.size()" + mPicPaths.size());
 		if (mPicPaths.size() > 0) {
-			mNeedUploadPicPaths = new ArrayList<>();
+			List<String> needUploadPicPaths = new ArrayList<>();
 			for (String path : mPicPaths) {
 				if (path.startsWith(Constant.BASE_IMAGE_CAPTURE_PATH)) {
-					mNeedUploadPicPaths.add(path);
+					needUploadPicPaths.add(path);
 				} else {
 					List<PicUrl> picUrls = mSubcategory.getIndex_pic();
 					if (picUrls == null) {
@@ -500,9 +504,9 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 					mSubcategory.setIndex_pic(picUrls);
 				}
 			}
-			if (!mNeedUploadPicPaths.isEmpty()) {
+			if (!needUploadPicPaths.isEmpty()) {
 				final List<Map<String, String>> files = new ArrayList<>();
-				for (String path : mNeedUploadPicPaths) {
+				for (String path : needUploadPicPaths) {
 					Map<String, String> map = new HashMap<>();
 					map.put(QiniuUploadManager.KEY_FILE_PATH, path);
 					map.put(QiniuUploadManager.KEY_SAVE_NAME, path.replace(Constant.BASE_IMAGE_CAPTURE_PATH, ""));
@@ -555,7 +559,7 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 						getProgressDialogUtils().cancel();
 						Log.d(TAG, "startSaveSubcategoryByDirector" + " --> " + response);
 						try {
-							ResponseDTO dto = JsonUtil.parseObject(response, ResponseDTO.class);
+							ResponseDTO dto = JsonUtil.parseObject(response, SimpleResultDTO.class);
 							if (dto.isValid()) {
 								finish();
 							} else {

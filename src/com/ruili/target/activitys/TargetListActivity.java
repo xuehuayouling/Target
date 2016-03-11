@@ -2,8 +2,11 @@ package com.ruili.target.activitys;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request.Method;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -16,11 +19,14 @@ import com.ruili.target.entity.Category;
 import com.ruili.target.entity.CheckTime;
 import com.ruili.target.entity.Employee;
 import com.ruili.target.entity.EmployeeListDTO;
+import com.ruili.target.entity.ResponseDTO;
+import com.ruili.target.entity.SimpleResultDTO;
 import com.ruili.target.fragments.DetailFragment;
 import com.ruili.target.fragments.MainFragment;
 import com.ruili.target.utils.Constant;
 import com.ruili.target.utils.DateUtils;
 import com.ruili.target.utils.DecodeJsonResponseUtils;
+import com.ruili.target.utils.JsonUtil;
 import com.ruili.target.utils.Logger;
 
 import android.app.DatePickerDialog;
@@ -29,6 +35,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -59,7 +66,6 @@ public class TargetListActivity extends BaseActivity implements OnClickListener 
 	private TextView mTVEmployee;
 	public static final int OPETATOR_ID_INVALID = -1;
 	private int mOperatorID = OPETATOR_ID_INVALID;
-	private boolean firstResume = true;
 	private PopupWindow mTimeMenus;
 	private ArrayAdapter<CheckTime> mTimeMenuAdapter;
 	private PopupWindow mEmployeeMenus;
@@ -137,16 +143,6 @@ public class TargetListActivity extends BaseActivity implements OnClickListener 
 		}
 	}
 
-	@Override
-	protected void onResume() {
-		super.onResume();
-		// 第一次进入今日指标的话直接加载数据
-		if ((mType == TYPE_TODAY || mType == TYPE_HISTORY) && firstResume) {
-			firstResume = false;
-			updateMainFragment();
-		}
-	}
-
 	private void initRequestQueue() {
 		mQueue = Volley.newRequestQueue(this);
 	}
@@ -178,7 +174,7 @@ public class TargetListActivity extends BaseActivity implements OnClickListener 
 			finish();
 			break;
 		case R.id.tv_scan:
-			// showCaptureActivity();
+			 showCaptureActivity();
 			break;
 		case R.id.iv_menu:
 			showOrHideTimeMenus();
@@ -364,6 +360,15 @@ public class TargetListActivity extends BaseActivity implements OnClickListener 
 		startActivityForResult(intent, SCAN_REQUEST_CODE);
 	}
 
+	private boolean isFirstResume = true;
+	@Override
+	protected void onResume() {
+		super.onResume();
+		if (mType == TYPE_HISTORY && isFirstResume) {
+			updateMainFragment();
+		}
+	}
+
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (resultCode == RESULT_OK && requestCode == SCAN_REQUEST_CODE) {
@@ -372,15 +377,29 @@ public class TargetListActivity extends BaseActivity implements OnClickListener 
 		}
 	}
 
-	private void decodeBarcodeFromNetWork(String barcode) {
+	private void decodeBarcodeFromNetWork(final String barcode) {
+		Logger.debug(TAG,  "decodeBarcodeFromNetWork" + " --> barcode："  + barcode);
 		mProgressDialogUtils.show();
-		StringRequest stringRequest = new StringRequest(Method.GET, getBarcodeUrl(barcode),
+		StringRequest stringRequest = new StringRequest(Method.PUT, getBarcodeUrl(barcode),
 				new Response.Listener<String>() {
 
 					@Override
 					public void onResponse(String response) {
 						mProgressDialogUtils.cancel();
-						updateMainFragment();
+						Log.d(TAG, "decodeBarcodeFromNetWork" + " --> " + response);
+						try {
+							ResponseDTO dto = JsonUtil.parseObject(response, SimpleResultDTO.class);
+							if (dto.isValid()) {
+								updateMainFragment();
+							} else {
+								getToast().show(getString(R.string.barcode_invalid));
+								Logger.debug(TAG,  "decodeBarcodeFromNetWork" + " --> " + getString(R.string.barcode_invalid) + response);
+							}
+						} catch (Exception e) {
+							getToast().show(getString(R.string.service_fail));
+							e.printStackTrace();
+							Logger.debug(TAG, "decodeBarcodeFromNetWork" + " --> " + getString(R.string.can_not_decode_data) + response);
+						}
 					}
 				}, new Response.ErrorListener() {
 
@@ -390,12 +409,21 @@ public class TargetListActivity extends BaseActivity implements OnClickListener 
 						mToast.show(R.string.netword_fail);
 						Logger.debug(TAG, "decodeBarcodeFromNetWork fail -->  " + error.toString());
 					}
-				});
+				}) {
+
+					@Override
+					protected Map<String, String> getParams() throws AuthFailureError {
+						Map<String, String> map = new HashMap<String, String>();
+						map.put("orcode", String.valueOf(barcode));
+						return map;
+					}
+			
+		};
 		mQueue.add(stringRequest);
 	}
 
 	private String getBarcodeUrl(String barcode) {
-		return Constant.BASE_URL + String.format("/api/v1/index/%d/%s", getUserOperatorID(), barcode);
+		return Constant.BASE_URL + String.format("/api/v1/index/%d/orcode", getUserOperatorID());
 	}
 
 	private void updateMainFragment() {
