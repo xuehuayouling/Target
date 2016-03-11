@@ -109,6 +109,8 @@ public class MainFragment extends ListFragment {
 		String url = Constant.BASE_URL + String.format("/api/v1/index/%d/big_indexs", mOperatorID);
 		if (mActivity.getType() == TargetListActivity.TYPE_INSPECT_SUPERVISE) {
 			url = Constant.BASE_URL + String.format("/api/v1/index/%s/%d/big_indexs", mDate, mOperatorID);
+		} else if (mActivity.getType() == TargetListActivity.TYPE_HISTORY) {
+			url = Constant.BASE_URL + String.format("/api/v1/index/%s/%d/big_indexs", mDate, mOperatorID);
 		}
 		Logger.debug(TAG, "getCategoryUrl -->  " + url);
 		return url;

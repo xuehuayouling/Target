@@ -60,8 +60,9 @@ public class TargetListActivity extends BaseActivity implements OnClickListener,
 	private int mType;
 	private TextView mTVDate;
 	private TextView mTVEmployee;
-	
-	private int mOperatorID = -1;
+
+	public static final int OPETATOR_ID_INVALID = -1;
+	private int mOperatorID = OPETATOR_ID_INVALID;
 	private boolean firstResume = true;
 
 	@Override
@@ -70,52 +71,78 @@ public class TargetListActivity extends BaseActivity implements OnClickListener,
 		mType = getIntent().getIntExtra(TYPE_KEY, -1);
 		initRequestQueue();
 		setContentView(R.layout.activity_target_list);
+		initActionbar();
 		FragmentManager manager = getFragmentManager();
 		mMainFragment = (MainFragment) manager.findFragmentById(R.id.fragment_main);
 		mMainFragment.setActivity(this);
 		mDetailFragment = (DetailFragment) manager.findFragmentById(R.id.fragment_detail);
 		mDetailFragment.setActivity(this);
-		initActionbar();
+		initOperatorID();
 	}
 
 	private void initActionbar() {
-		ImageView ivBack = (ImageView) findViewById(R.id.iv_back);
-		ImageView ivMenu = (ImageView) findViewById(R.id.iv_menu);
-		mTVDate = (TextView) findViewById(R.id.tv_date);
-		mTVDate.setText(getDateString(new Date()));
-		mTVEmployee = (TextView) findViewById(R.id.tv_employee);
-		SearchView svSearch = (SearchView) findViewById(R.id.sv_search);
+		initImageViewBack();
+		initTextViewDate();
+		initTextViewEmployee();
+		initTextViewScan();
+		initImageViewMenu();
+	}
+
+	private void initTextViewScan() {
 		TextView tvScan = (TextView) findViewById(R.id.tv_scan);
-		ivBack.setOnClickListener(this);
-		ivMenu.setOnClickListener(this);
-		mTVEmployee.setOnClickListener(this);
-		mTVDate.setOnClickListener(this);
-		svSearch.setOnQueryTextListener(this);
-		svSearch.setVisibility(View.GONE);
 		tvScan.setOnClickListener(this);
-		switch (mType) {
-		case TYPE_TODAY:
-			mTVDate.setVisibility(View.GONE);
-			mTVEmployee.setVisibility(View.GONE);
-			svSearch.setVisibility(View.GONE);
-			break;
-		case TYPE_HISTORY:
-			break;
-		case TYPE_INSPECT_SUPERVISE:
+		if (mType == TYPE_TODAY) {
+			tvScan.setVisibility(View.VISIBLE);
+		} else {
 			tvScan.setVisibility(View.GONE);
-			break;
-		default:
-			break;
 		}
 	}
-	
+
+	private void initTextViewEmployee() {
+		mTVEmployee = (TextView) findViewById(R.id.tv_employee);
+		mTVEmployee.setOnClickListener(this);
+		if (mType == TYPE_INSPECT_SUPERVISE) {
+			mTVEmployee.setVisibility(View.VISIBLE);
+		} else {
+			mTVEmployee.setVisibility(View.GONE);
+		}
+	}
+
+	private void initImageViewBack() {
+		ImageView ivBack = (ImageView) findViewById(R.id.iv_back);
+		ivBack.setOnClickListener(this);
+	}
+
+	private void initImageViewMenu() {
+		ImageView ivMenu = (ImageView) findViewById(R.id.iv_menu);
+		ivMenu.setOnClickListener(this);
+	}
+
+	private void initTextViewDate() {
+		mTVDate = (TextView) findViewById(R.id.tv_date);
+		mTVDate.setText(getDateString(new Date()));
+		mTVDate.setOnClickListener(this);
+		if (mType == TYPE_HISTORY || mType == TYPE_INSPECT_SUPERVISE) {
+			mTVDate.setVisibility(View.GONE);
+		} else {
+			mTVDate.setVisibility(View.VISIBLE);
+		}
+	}
+
+	private void initOperatorID() {
+		if (mType == TYPE_HISTORY || mType == TYPE_TODAY) {
+			mOperatorID = getUserOperatorID();
+		} else {
+			mOperatorID = OPETATOR_ID_INVALID;
+		}
+	}
+
 	@Override
 	protected void onResume() {
 		super.onResume();
 		// 第一次进入今日指标的话直接加载数据
-		if (mType == TYPE_TODAY && firstResume) {
+		if ((mType == TYPE_TODAY || mType == TYPE_HISTORY) && firstResume) {
 			firstResume = false;
-			mOperatorID = getUserOperatorID();
 			updateMainFragment();
 		}
 	}
@@ -134,6 +161,7 @@ public class TargetListActivity extends BaseActivity implements OnClickListener,
 	public int getType() {
 		return mType;
 	}
+
 	public void onMainListItemClick(Category category) {
 		updateDetailsList(category.getId(), -1, mTVDate.getText().toString());
 	}
@@ -164,26 +192,25 @@ public class TargetListActivity extends BaseActivity implements OnClickListener,
 			break;
 		}
 	}
-	
-	
+
 	private String getDateString(Date date) {
 		return DateUtils.getDateString(date);
 	}
-	
+
 	private void showDatePickerDialog() {
 		Calendar c = Calendar.getInstance();
 		DatePickerDialog dialog = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
-			
+
 			public void onDateSet(DatePicker dp, int year, int month, int dayOfMonth) {
 				final String newDate = getDateString(new Date(year - 1900, month, dayOfMonth));
 				if (!mTVDate.getText().equals(newDate)) {
 					mTVDate.setText(newDate);
-					if (mType == TYPE_INSPECT_SUPERVISE) {
+					if (mType == TYPE_INSPECT_SUPERVISE || mType == TYPE_HISTORY) {
 						updateMainFragment();
 					}
 				}
 			}
-			
+
 		}, c.get(Calendar.YEAR), // 传入年份
 				c.get(Calendar.MONTH), // 传入月份
 				c.get(Calendar.DAY_OF_MONTH) // 传入天数
@@ -206,7 +233,7 @@ public class TargetListActivity extends BaseActivity implements OnClickListener,
 			mTimeMenus.dismiss();
 		}
 	}
-	
+
 	private void dismissEmployeeMenus() {
 		if (mEmployeeMenus != null && mEmployeeMenus.isShowing()) {
 			mEmployeeMenus.dismiss();
@@ -219,37 +246,36 @@ public class TargetListActivity extends BaseActivity implements OnClickListener,
 
 	private PopupWindow mEmployeeMenus;
 	private ArrayAdapter<Employee> mEmployeeMenuAdapter;
-	
+
 	private void showOrHideEmployeeMenus() {
 		if (mEmployeeMenus != null && mEmployeeMenus.isShowing()) {
 			dismissEmployeeMenus();
 		} else {
 			getEmployeesAndShowMenu();
-			
+
 		}
 	}
 
 	private void getEmployeesAndShowMenu() {
 		mProgressDialogUtils.show();
-		StringRequest stringRequest = new StringRequest(Method.GET, getEmployeesUrl(),
-				new Response.Listener<String>() {
+		StringRequest stringRequest = new StringRequest(Method.GET, getEmployeesUrl(), new Response.Listener<String>() {
 
-					@Override
-					public void onResponse(String response) {
-						mProgressDialogUtils.cancel();
-						decodeEmployeesAndShowMenu(response);
-					}
-				}, new Response.ErrorListener() {
+			@Override
+			public void onResponse(String response) {
+				mProgressDialogUtils.cancel();
+				decodeEmployeesAndShowMenu(response);
+			}
+		}, new Response.ErrorListener() {
 
-					@Override
-					public void onErrorResponse(VolleyError error) {
-						Logger.debug(TAG, "decodeBarcode fail -->  " + error.toString());
-						mProgressDialogUtils.cancel();
-						mToast.show(R.string.netword_fail);
-					}
-				});
+			@Override
+			public void onErrorResponse(VolleyError error) {
+				Logger.debug(TAG, "decodeBarcode fail -->  " + error.toString());
+				mProgressDialogUtils.cancel();
+				mToast.show(R.string.netword_fail);
+			}
+		});
 		mQueue.add(stringRequest);
-		
+
 	}
 
 	protected void decodeEmployeesAndShowMenu(String response) {
@@ -279,7 +305,7 @@ public class TargetListActivity extends BaseActivity implements OnClickListener,
 			showTimeMenus();
 		}
 	}
-	
+
 	private void showTimeMenus() {
 		if (mCheckTimes != null && mCheckTimes.size() > 0) {
 			if (mTimeMenus == null) {
@@ -313,7 +339,7 @@ public class TargetListActivity extends BaseActivity implements OnClickListener,
 			mTimeMenus.showAsDropDown(findViewById(R.id.iv_menu), 10, 10);
 		}
 	}
-	
+
 	private void showEmployeeMenus(List<Employee> employees) {
 		if (employees != null && employees.size() > 0) {
 			if (mEmployeeMenus == null) {
@@ -353,7 +379,7 @@ public class TargetListActivity extends BaseActivity implements OnClickListener,
 	public int getOperatorId() {
 		return mOperatorID;
 	}
-	
+
 	private void showCaptureActivity() {
 		Intent intent = new Intent(this, CaptureActivity.class);
 		startActivityForResult(intent, SCAN_REQUEST_CODE);
@@ -399,7 +425,7 @@ public class TargetListActivity extends BaseActivity implements OnClickListener,
 		mDetailFragment.clear();
 		mMainFragment.setParams(mTVDate.getText().toString(), mOperatorID);
 	}
-	
+
 	@Override
 	public boolean onQueryTextSubmit(String query) {
 		// TODO Auto-generated method stub

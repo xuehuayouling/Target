@@ -130,12 +130,15 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
+        android:background="@drawable/bg_ll_default_normal"
+        android:padding="15dp"
+        android:layout_margin="5dp"
         android:gravity="center" >
 
         <EditText
             android:id="@+id/et_remark"
-            android:layout_width="892dp"
-            android:layout_height="192dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:background="@drawable/selector_et"
             android:gravity="start|top"
             android:inputType="text"
@@ -143,19 +146,21 @@
 
         <TextView
             android:id="@+id/tv_remark"
-            android:layout_width="892dp"
-            android:layout_height="192dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:maxLines="5"
-            android:visibility="gone"
-            tools:ignore="LabelFor" />
+            android:visibility="gone" />
     </RelativeLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
+        android:background="@drawable/bg_ll_default_normal"
+        android:gravity="center"
         android:orientation="horizontal"
-        android:padding="20dp" >
+        android:layout_margin="5dp"
+        android:padding="15dp" >
 
         <Gallery
             android:id="@+id/ll_pics"
@@ -177,12 +182,15 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/ll_comment"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:orientation="horizontal"
         android:baselineAligned="false"
-        android:padding="20dp" >
+        android:orientation="horizontal"
+        android:background="@drawable/bg_ll_default_normal"
+        android:layout_margin="5dp"
+        android:padding="15dp" >
 
         <LinearLayout
             android:layout_width="0dp"
@@ -197,7 +205,8 @@
                 android:layout_margin="2dp"
                 android:layout_weight="1"
                 android:background="@android:color/darker_gray"
-                android:text="@string/satisfaction_good" />
+                android:text="@string/satisfaction_good"
+                android:textColor="@android:color/white" />
 
             <Button
                 android:id="@+id/btn_satisfaction_normal"
@@ -206,7 +215,8 @@
                 android:layout_margin="2dp"
                 android:layout_weight="1"
                 android:background="@android:color/darker_gray"
-                android:text="@string/satisfaction_normal" />
+                android:text="@string/satisfaction_normal"
+                android:textColor="@android:color/white" />
 
             <Button
                 android:id="@+id/btn_satisfaction_bad"
@@ -215,12 +225,14 @@
                 android:layout_margin="2dp"
                 android:layout_weight="1"
                 android:background="@android:color/darker_gray"
-                android:text="@string/satisfaction_bad" />
+                android:text="@string/satisfaction_bad"
+                android:textColor="@android:color/white" />
         </LinearLayout>
 
         <RelativeLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_marginStart="5dp"
             android:layout_weight="4"
             android:gravity="center" >
 
@@ -232,6 +244,13 @@
                 android:gravity="start|top"
                 android:inputType="text"
                 tools:ignore="LabelFor" />
+
+            <TextView
+                android:id="@+id/tv_comment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:maxLines="5"
+                android:visibility="gone" />
         </RelativeLayout>
     </LinearLayout>
 

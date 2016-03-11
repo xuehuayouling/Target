@@ -62,6 +62,7 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 	private EditText mETRemark;
 	private TextView mTVRemark;
 	private EditText mETComment;
+	private TextView mTVComment;
 	private Gallery mGlpics;
 	private LayoutInflater mInflater;
 	private ImageAdapter mImageAdapter;
@@ -115,7 +116,7 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 
 			@Override
 			public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
-				if (mType == TargetListActivity.TYPE_INSPECT_SUPERVISE) {
+				if (mType == TargetListActivity.TYPE_INSPECT_SUPERVISE || mType == TargetListActivity.TYPE_HISTORY) {
 					return false;
 				} else {
 					Dialog dialog = new AlertDialog.Builder(TargetDetailsActivity.this)
@@ -149,7 +150,8 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 		btnSatisfactionNormal.setOnClickListener(this);
 		btnSatisfactionBad.setOnClickListener(this);
 		mETComment = (EditText) findViewById(R.id.et_comment);
-		if (mType == TargetListActivity.TYPE_INSPECT_SUPERVISE) {
+		mTVComment = (TextView) findViewById(R.id.tv_comment);
+		if (mType == TargetListActivity.TYPE_INSPECT_SUPERVISE || mType == TargetListActivity.TYPE_HISTORY) {
 			for (int i = 0; i < mRGState.getChildCount(); i++) {
 				mRGState.getChildAt(i).setEnabled(false);
 			}
@@ -157,6 +159,17 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 			mTVRemark.setVisibility(View.VISIBLE);
 			mETRemark.setVisibility(View.GONE);
 			imgVTakePhoto.setVisibility(View.GONE);
+		}
+		if (mType == TargetListActivity.TYPE_HISTORY) {
+			tvSave.setVisibility(View.GONE);
+			btnSatisfactionGood.setClickable(false);
+			btnSatisfactionNormal.setClickable(false);
+			btnSatisfactionBad.setClickable(false);
+			mTVComment.setVisibility(View.VISIBLE);
+			mETComment.setVisibility(View.GONE);
+		}
+		if (mType == TargetListActivity.TYPE_TODAY) {
+			findViewById(R.id.ll_comment).setVisibility(View.GONE);
 		}
 	}
 
@@ -267,6 +280,7 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 			mETRemark.setText(mSubcategory.getIndex_remark());
 			mTVRemark.setText(mSubcategory.getIndex_remark());
 			mETComment.setText(mSubcategory.getQc_describe());
+			mTVComment.setText(mSubcategory.getQc_describe());
 			try {
 				int qc_state = Integer.valueOf(mSubcategory.getQc_state());
 				updateSatisfactionBtn(qc_state);
