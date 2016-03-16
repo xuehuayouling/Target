@@ -10,7 +10,7 @@ public class Constant {
 	public static final String SonSDCardD = "/storage/emulated/0/DCIM/Camera/";
 	public static final String CAMERA_FILE_PATH = "/storage/emulated/0/DCIM/Camera/";
 	public static final String EXTERNAL_STORAGE_DIRECTORY = Environment.getExternalStorageDirectory().getPath() + "/";
-	public static final String PIC_END_STR = ".jpg";
+	public static final String PIC_END_STR = ".png";
 	public static final String getPicUrl(String url) {
 		if (TextUtil.isEmpty(url)) {
 			return url;

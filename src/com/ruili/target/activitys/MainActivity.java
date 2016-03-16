@@ -14,6 +14,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.ImageButton;
 import android.widget.PopupWindow;
+import android.widget.TextView;
 
 public class MainActivity extends BaseActivity implements OnClickListener {
 
@@ -55,6 +56,8 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 			findViewById(R.id.ll_today_targets).setVisibility(View.VISIBLE);
 			break;
 		}
+		TextView tvOperatorName = (TextView) findViewById(R.id.tv_name);
+		tvOperatorName.setText(getString(R.string.operator_name, getUserName()));
 	}
 
 	private void clearUserInfo() {

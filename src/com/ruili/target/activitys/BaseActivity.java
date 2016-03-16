@@ -45,5 +45,10 @@ public class BaseActivity extends Activity {
 		SharedPreferences sharedPreferences = getSharedPreferences(User.SHAREDPREFERENCES_KEY, Activity.MODE_PRIVATE);
 		return sharedPreferences.getInt(User.SHAREDPREFERENCES_TYEP, -1);
 	}
+	
+	public String getUserName() {
+		SharedPreferences sharedPreferences = getSharedPreferences(User.SHAREDPREFERENCES_KEY, Activity.MODE_PRIVATE);
+		return sharedPreferences.getString(User.SHAREDPREFERENCES_NAME, "");
+	}
 
 }

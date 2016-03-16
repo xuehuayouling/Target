@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">瑞丽洗涤</string>
+    <string name="app_name">瑞丽流程检查</string>
     <string name="action_settings">设置</string>
     <string name="action_login">登录</string>
+    <string name="operator_name">操作人：%1s</string>
     <string name="today_targets">今日指标</string>
     <string name="history_targets">历史指标</string>
     <string name="inspect_supervise">视察监督</string>

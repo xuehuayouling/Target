@@ -126,7 +126,12 @@ public class TargetListActivity extends BaseActivity implements OnClickListener 
 
 	private void initTextViewDate() {
 		mTVDate = (TextView) findViewById(R.id.tv_date);
-		mTVDate.setText(getDateString(new Date()));
+		Calendar c = Calendar.getInstance();
+		if (mType == TYPE_HISTORY) {
+			c.set(Calendar.DAY_OF_MONTH, c.get(Calendar.DAY_OF_MONTH) - 1);
+		}
+		Date date = new Date(c.getTimeInMillis());
+		mTVDate.setText(getDateString(date));
 		mTVDate.setOnClickListener(this);
 		if (mType == TYPE_HISTORY || mType == TYPE_INSPECT_SUPERVISE) {
 			mTVDate.setVisibility(View.VISIBLE);
@@ -210,6 +215,13 @@ public class TargetListActivity extends BaseActivity implements OnClickListener 
 				c.get(Calendar.MONTH), // 传入月份
 				c.get(Calendar.DAY_OF_MONTH) // 传入天数
 		);
+		DatePicker datePicker = dialog.getDatePicker();
+		if (mType == TYPE_HISTORY) {
+			c.set(Calendar.DAY_OF_MONTH, c.get(Calendar.DAY_OF_MONTH) - 1);
+			datePicker.setMaxDate(c.getTimeInMillis());
+		} else if (mType == TYPE_INSPECT_SUPERVISE) {
+			datePicker.setMaxDate(c.getTimeInMillis());
+		} 
 		dialog.show();
 	}
 

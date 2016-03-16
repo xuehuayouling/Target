@@ -93,7 +93,7 @@ public class ImageAdapter extends BaseAdapter {
 	private void downLoadPic(String picUrl, ImageView imageView) {
 		ImageLoader imageLoader = new ImageLoader(mQueue, mBitmapCache);  
 		ImageListener listener = ImageLoader.getImageListener(imageView,  
-		        R.drawable.ic_arrow_right, R.drawable.ic_arrow_left);
+		        R.drawable.ic_loading, R.drawable.ic_load_failed);
 		imageLoader.get(Constant.getPicUrl(picUrl), listener);  
 	}
 	
@@ -101,7 +101,7 @@ public class ImageAdapter extends BaseAdapter {
 		if (TextUtil.isEmpty(picPath)) {
 			return null;
 		}
-		return ImageTool.compressBitmap(picPath, 400, 300);
+		return ImageTool.compressBitmap(picPath, 1024, 768);
 	}
 
 	class ViewHolder {
