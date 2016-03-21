@@ -63,6 +63,7 @@ public class TargetListActivity extends BaseActivity implements OnClickListener 
 	public static final int TYPE_INSPECT_SUPERVISE = 2;
 	private int mType;
 	private TextView mTVDate;
+	private TextView mTVTime;
 	private TextView mTVEmployee;
 	public static final int OPETATOR_ID_INVALID = -1;
 	private int mOperatorID = OPETATOR_ID_INVALID;
@@ -90,6 +91,7 @@ public class TargetListActivity extends BaseActivity implements OnClickListener 
 		initImageViewBack();
 		initTextViewDate();
 		initTextViewEmployee();
+		initTextViewTime();
 		initTextViewScan();
 		initImageViewMenu();
 	}
@@ -124,6 +126,15 @@ public class TargetListActivity extends BaseActivity implements OnClickListener 
 		ivMenu.setOnClickListener(this);
 	}
 
+	private void initTextViewTime() {
+		mTVTime = (TextView) findViewById(R.id.tv_time);
+		if (mType == TYPE_TODAY) {
+			mTVTime.setVisibility(View.VISIBLE);
+		} else {
+			mTVTime.setVisibility(View.GONE);
+		}
+	}
+	
 	private void initTextViewDate() {
 		mTVDate = (TextView) findViewById(R.id.tv_date);
 		Calendar c = Calendar.getInstance();
@@ -164,6 +175,7 @@ public class TargetListActivity extends BaseActivity implements OnClickListener 
 	}
 
 	public void onMainListItemClick(Category category) {
+		mTVTime.setText(R.string.time_all);
 		setCheckTimes(category.getChecktime());
 		updateDetailsList(category.getId(), CheckTime.CHECK_TIME_NULL, mTVDate.getText().toString());
 	}
@@ -314,6 +326,7 @@ public class TargetListActivity extends BaseActivity implements OnClickListener 
 
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				mTVTime.setText(mTimeMenuAdapter.getItem(position).toString());
 				mDetailFragment.setCheckTimeID(mTimeMenuAdapter.getItem(position).getId());
 				dismissTimeMenus();
 			}
@@ -441,6 +454,7 @@ public class TargetListActivity extends BaseActivity implements OnClickListener 
 	}
 
 	private void updateMainFragment() {
+		mTVTime.setText(R.string.time_all);
 		mDetailFragment.clear();
 		mMainFragment.setParams(mTVDate.getText().toString(), mOperatorID);
 	}

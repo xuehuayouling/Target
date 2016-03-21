@@ -17,6 +17,7 @@
     <string name="scan">扫描</string>
     <string name="example_date">2016–03–03</string>
     <string name="please_choice_employee">请选择员工</string>
+    <string name="time_all">全部时间段</string>
     <string name="get_data_fail">获取数据失败</string>
     <string name="no_valid_data">无有效数据</string>
     <string name="can_not_decode_data">无法解析数据</string>

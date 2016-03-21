@@ -2,6 +2,7 @@ package com.ruili.target.activitys;
 
 import com.ruili.target.R;
 import com.ruili.target.entity.User;
+import com.umeng.update.UmengUpdateAgent;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -23,6 +24,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		UmengUpdateAgent.update(this);
 		if (-1 == getUserType()) {
 			showLoginActivity();
 		}
