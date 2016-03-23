@@ -53,6 +53,8 @@ import android.widget.TextView;
 
 public class TargetDetailsActivity extends BaseActivity implements OnClickListener {
 	public static final String KEY_SUBCATEGORY = "subcategory";
+	public static final String KEY_SUBCATEGORY_COMPLETE = "subcategory_complete";
+	public static final String KEY_SUBCATEGORY_SCORE = "subcategory_score";
 	public static final String KEY_TYPE = "type";
 	private static final int REQUEST_CODE_IMAGE_CAPTURE = 300;
 	private String photoUriPath;
@@ -323,6 +325,10 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 			if (mSubcategory.getIndex_type() == Subcategory.INDEX_TYPE_SCORE) {
 				mRGState.setVisibility(View.GONE);
 				mRBarScore.setVisibility(View.VISIBLE);
+				String scoreStr = getIntent().getStringExtra(KEY_SUBCATEGORY_SCORE);
+				if (scoreStr != null) {
+					mSubcategory.setIndex_score(scoreStr);
+				}
 				int score = 0;
 				try {
 					score = Integer.valueOf(mSubcategory.getIndex_score());
@@ -332,6 +338,7 @@ public class TargetDetailsActivity extends BaseActivity implements OnClickListen
 			} else {
 				mRGState.setVisibility(View.VISIBLE);
 				mRBarScore.setVisibility(View.GONE);
+				mSubcategory.setIndex_complete(getIntent().getIntExtra(KEY_SUBCATEGORY_COMPLETE, mSubcategory.getIndex_complete()));
 				if (mSubcategory.getIndex_complete() == Subcategory.INDEX_COMPLETE_YES) {
 					mRGState.check(R.id.rbtn_yes);
 				} else if (mSubcategory.getIndex_complete() == Subcategory.INDEX_COMPLETE_NO) {

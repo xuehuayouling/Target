@@ -117,7 +117,11 @@ public class DetailFragment extends ListFragment {
 	private String getSubCategoryUrl() {
 		String checktime = String.valueOf(mCheckTimeId);
 		if (CheckTime.CHECK_TIME_NULL == mCheckTimeId) {
-			checktime = null;
+			if (mActivity.getType() == TargetListActivity.TYPE_TODAY) {
+				checktime = "0";
+			} else {
+				checktime = null;
+			}
 		}
 		int operatoryId = mActivity.getUserOperatorID();
 		if (mActivity.getType() == TargetListActivity.TYPE_INSPECT_SUPERVISE) {

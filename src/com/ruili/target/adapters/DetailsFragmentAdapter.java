@@ -10,6 +10,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.ruili.target.R;
+import com.ruili.target.activitys.TargetDetailsActivity;
 import com.ruili.target.activitys.TargetListActivity;
 import com.ruili.target.entity.Subcategory;
 import com.ruili.target.entity.SubcategoryDTO;
@@ -18,6 +19,7 @@ import com.ruili.target.utils.JsonUtil;
 import com.ruili.target.utils.Logger;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -104,29 +106,55 @@ public class DetailsFragmentAdapter extends BaseAdapter {
 			} else {
 				holder.rgState.clearCheck();
 			}
-			holder.rgState.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+			holder.rgState.findViewById(R.id.rbtn_yes).setOnClickListener(new View.OnClickListener() {
 				
 				@Override
-				public void onCheckedChanged(RadioGroup group, int checkedId) {
-					switch (checkedId) {
-					case R.id.rbtn_yes:
-						if (subcategory.getIndex_complete() != Subcategory.INDEX_COMPLETE_YES) {
-							subcategory.setIndex_complete(Subcategory.INDEX_COMPLETE_YES);
-							updateSubcategory(subcategory, viewState);
-						}
-						break;
-					case R.id.rbtn_no:
-						if (subcategory.getIndex_complete() != Subcategory.INDEX_COMPLETE_NO) {
-							subcategory.setIndex_complete(Subcategory.INDEX_COMPLETE_NO);
-							updateSubcategory(subcategory, viewState);
-						}
-						break;
-					default:
-						break;
+				public void onClick(View v) {
+					if (subcategory.getIndex_complete() != Subcategory.INDEX_COMPLETE_YES) {
+						subcategory.setIndex_complete(Subcategory.INDEX_COMPLETE_YES);
+						updateSubcategory(subcategory, viewState);
 					}
-					
 				}
 			});
+			holder.rgState.findViewById(R.id.rbtn_no).setOnClickListener(new View.OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					if (subcategory.getIndex_complete() != Subcategory.INDEX_COMPLETE_NO) {
+						Intent intent = new Intent(mActivity, TargetDetailsActivity.class);
+						intent.putExtra(TargetDetailsActivity.KEY_SUBCATEGORY, subcategory.getIndex_log_id());
+						intent.putExtra(TargetDetailsActivity.KEY_SUBCATEGORY_COMPLETE, Subcategory.INDEX_COMPLETE_NO);
+						intent.putExtra(TargetDetailsActivity.KEY_TYPE, mActivity.getType());
+						mActivity.startActivity(intent);
+					}
+				}
+			});
+//			holder.rgState.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+//				
+//				@Override
+//				public void onCheckedChanged(RadioGroup group, int checkedId) {
+//					switch (checkedId) {
+//					case R.id.rbtn_yes:
+//						if (subcategory.getIndex_complete() != Subcategory.INDEX_COMPLETE_YES) {
+//							subcategory.setIndex_complete(Subcategory.INDEX_COMPLETE_YES);
+//							updateSubcategory(subcategory, viewState);
+//						}
+//						break;
+//					case R.id.rbtn_no:
+//						if (subcategory.getIndex_complete() != Subcategory.INDEX_COMPLETE_NO) {
+//							subcategory.setIndex_complete(Subcategory.INDEX_COMPLETE_NO);
+//							Intent intent = new Intent(mActivity, TargetDetailsActivity.class);
+//							intent.putExtra(TargetDetailsActivity.KEY_SUBCATEGORY, subcategory.getIndex_log_id());
+//							intent.putExtra(TargetDetailsActivity.KEY_TYPE, mActivity.getType());
+//							mActivity.startActivity(intent);
+//						}
+//						break;
+//					default:
+//						break;
+//					}
+//					
+//				}
+//			});
 		} else if (Subcategory.INDEX_TYPE_SCORE == subcategory.getIndex_type()) {
 			holder.rgState.setVisibility(View.GONE);
 			holder.llScore.setVisibility(View.VISIBLE);
@@ -144,8 +172,16 @@ public class DetailsFragmentAdapter extends BaseAdapter {
 				@Override
 				public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
 					if (fromUser) {
-						subcategory.setIndex_score(String.valueOf((int)rating));
-						updateSubcategory(subcategory, viewState);
+						if (rating < 3) {
+							Intent intent = new Intent(mActivity, TargetDetailsActivity.class);
+							intent.putExtra(TargetDetailsActivity.KEY_SUBCATEGORY, subcategory.getIndex_log_id());
+							intent.putExtra(TargetDetailsActivity.KEY_SUBCATEGORY_SCORE, String.valueOf((int)rating));
+							intent.putExtra(TargetDetailsActivity.KEY_TYPE, mActivity.getType());
+							mActivity.startActivity(intent);
+						} else {
+							subcategory.setIndex_score(String.valueOf((int)rating));
+							updateSubcategory(subcategory, viewState);
+						}
 					}
 				}
 			});

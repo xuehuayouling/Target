@@ -18,6 +18,7 @@
     <string name="example_date">2016–03–03</string>
     <string name="please_choice_employee">请选择员工</string>
     <string name="time_all">全部时间段</string>
+    <string name="time_now">当前时间段</string>
     <string name="get_data_fail">获取数据失败</string>
     <string name="no_valid_data">无有效数据</string>
     <string name="can_not_decode_data">无法解析数据</string>
@@ -33,6 +34,8 @@
     <string name="satisfaction_bad">不满意</string>
     <string name="capture_image_fail">拍照失败，请重试</string>
     <string name="barcode_invalid">无效二维码</string>
+    <string name="good">正常</string>
+    <string name="bad">不正常</string>
     
     <string name="app_picker_name">Applications</string>
     <string name="bookmark_picker_name">Bookmarks</string>

@@ -53,7 +53,7 @@
                 android:layout_marginEnd="50dp"
                 android:paddingEnd="10dp"
                 android:paddingStart="10dp"
-                android:text="@android:string/yes" />
+                android:text="@string/good" />
 
             <RadioButton
                 android:id="@+id/rbtn_no"
@@ -62,7 +62,7 @@
                 android:checked="true"
                 android:paddingEnd="10dp"
                 android:paddingStart="10dp"
-                android:text="@android:string/no" />
+                android:text="@string/bad" />
         </RadioGroup>
 
         <include layout="@layout/widget_arrow_right" />

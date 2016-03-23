@@ -72,7 +72,7 @@
                 android:drawablePadding="3dp"
                 android:gravity="center"
                 android:visibility="gone"
-                android:text="@string/time_all"
+                android:text="@string/time_now"
                 android:textColor="@android:color/white" />
 
             <SearchView

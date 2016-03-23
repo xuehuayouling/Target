@@ -175,7 +175,7 @@ public class TargetListActivity extends BaseActivity implements OnClickListener 
 	}
 
 	public void onMainListItemClick(Category category) {
-		mTVTime.setText(R.string.time_all);
+		mTVTime.setText(R.string.time_now);
 		setCheckTimes(category.getChecktime());
 		updateDetailsList(category.getId(), CheckTime.CHECK_TIME_NULL, mTVDate.getText().toString());
 	}
@@ -454,7 +454,7 @@ public class TargetListActivity extends BaseActivity implements OnClickListener 
 	}
 
 	private void updateMainFragment() {
-		mTVTime.setText(R.string.time_all);
+		mTVTime.setText(R.string.time_now);
 		mDetailFragment.clear();
 		mMainFragment.setParams(mTVDate.getText().toString(), mOperatorID);
 	}
