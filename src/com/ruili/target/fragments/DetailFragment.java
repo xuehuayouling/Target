@@ -1,5 +1,7 @@
 package com.ruili.target.fragments;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import com.android.volley.Request.Method;
@@ -14,6 +16,7 @@ import com.ruili.target.entity.CheckTime;
 import com.ruili.target.entity.Subcategory;
 import com.ruili.target.entity.SubcategoryListDTO;
 import com.ruili.target.utils.Constant;
+import com.ruili.target.utils.DateUtils;
 import com.ruili.target.utils.DecodeJsonResponseUtils;
 import com.ruili.target.utils.Logger;
 
@@ -127,8 +130,17 @@ public class DetailFragment extends ListFragment {
 		if (mActivity.getType() == TargetListActivity.TYPE_INSPECT_SUPERVISE) {
 			operatoryId = mActivity.getOperatorId();
 		}
+		String date = mDate;
+		if (mActivity.getType() == TargetListActivity.TYPE_TODAY) {
+			date = null;
+		} else if (mActivity.getType() == TargetListActivity.TYPE_INSPECT_SUPERVISE) {
+			Calendar c = Calendar.getInstance();
+			if (mDate.equals(DateUtils.getDateString(new Date(c.getTimeInMillis())))) {
+				date = null;
+			}
+		}
 		String url = Constant.BASE_URL
-				+ String.format("/api/v1/index/%d/%d/%s/%s/small_indexs", mCategoryId, operatoryId, checktime, mDate);
+				+ String.format("/api/v1/index/%d/%d/%s/%s/small_indexs", mCategoryId, operatoryId, checktime, date);
 		Logger.debug(TAG, "getSubCategoryUrl -->  " + url);
 		return url;
 	}
