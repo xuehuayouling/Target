@@ -22,6 +22,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.TextView;
 
 public class MainFragment extends ListFragment {
 	private TargetListActivity mActivity;
@@ -42,6 +43,7 @@ public class MainFragment extends ListFragment {
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
 		final Category category = (Category) mAdapter.getItem(position);
+		mAdapter.setSelectItem(position);
 		mActivity.onMainListItemClick(category);
 	}
 

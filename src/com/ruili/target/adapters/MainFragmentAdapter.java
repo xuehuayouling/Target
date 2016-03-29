@@ -18,7 +18,7 @@ public class MainFragmentAdapter extends BaseAdapter {
 
 	private LayoutInflater mInflater;
 	private List<Category> mCategories;
-
+	private int mSelectItemPosition = -1;
 	public MainFragmentAdapter(Context context, List<Category> categories) {
 		super();
 		if (null == categories) {
@@ -35,6 +35,12 @@ public class MainFragmentAdapter extends BaseAdapter {
 		} else {
 			mCategories = categories;
 		}
+		mSelectItemPosition = -1;
+		notifyDataSetChanged();
+	}
+	
+	public void setSelectItem(int position) {
+		mSelectItemPosition = position;
 		notifyDataSetChanged();
 	}
 
@@ -70,6 +76,11 @@ public class MainFragmentAdapter extends BaseAdapter {
 		final Category category = mCategories.get(position);
 		holder.tvTitle.setText(category.getName());
 		holder.btnNo.setText(String.valueOf(category.getId()));
+		if (mSelectItemPosition == position) {
+			holder.tvTitle.setTextColor(mInflater.getContext().getResources().getColor(android.R.color.holo_blue_bright));
+		} else {
+			holder.tvTitle.setTextColor(mInflater.getContext().getResources().getColor(android.R.color.black));
+		}
 		return view;
 	}
 
