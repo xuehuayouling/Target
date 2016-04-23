@@ -102,7 +102,9 @@ public class DetailsFragmentAdapter extends BaseAdapter {
 			holder.llScore.setVisibility(View.GONE);
 			holder.rgState.setVisibility(View.VISIBLE);
 			if (mActivity.getType() == TargetListActivity.TYPE_INSPECT_SUPERVISE
-					|| mActivity.getType() == TargetListActivity.TYPE_HISTORY) {
+					|| mActivity.getType() == TargetListActivity.TYPE_HISTORY
+					|| (mActivity.getType() == TargetListActivity.TYPE_TODAY
+							&& subcategory.getEdit_type().equals("0"))) {
 				holder.rgState.findViewById(R.id.rbtn_yes).setEnabled(false);
 				holder.rgState.findViewById(R.id.rbtn_no).setEnabled(false);
 			}
@@ -140,7 +142,9 @@ public class DetailsFragmentAdapter extends BaseAdapter {
 			holder.rgState.setVisibility(View.GONE);
 			holder.llScore.setVisibility(View.VISIBLE);
 			if (mActivity.getType() == TargetListActivity.TYPE_INSPECT_SUPERVISE
-					|| mActivity.getType() == TargetListActivity.TYPE_HISTORY) {
+					|| mActivity.getType() == TargetListActivity.TYPE_HISTORY
+					|| (mActivity.getType() == TargetListActivity.TYPE_TODAY
+							&& subcategory.getEdit_type().equals("0"))) {
 				holder.rbarScore.setEnabled(false);
 			}
 			int score = 0;
@@ -193,7 +197,9 @@ public class DetailsFragmentAdapter extends BaseAdapter {
 			holder.llScore2.setVisibility(View.GONE);
 			holder.rgState2.setVisibility(View.VISIBLE);
 			if (mActivity.getType() == TargetListActivity.TYPE_INSPECT_SUPERVISE
-					|| mActivity.getType() == TargetListActivity.TYPE_HISTORY) {
+					|| mActivity.getType() == TargetListActivity.TYPE_HISTORY
+					|| (mActivity.getType() == TargetListActivity.TYPE_TODAY
+							&& subcategory.getEdit_type().equals("0"))) {
 				holder.rgState2.findViewById(R.id.rbtn_yes2).setEnabled(false);
 				holder.rgState2.findViewById(R.id.rbtn_no2).setEnabled(false);
 			}
@@ -231,7 +237,9 @@ public class DetailsFragmentAdapter extends BaseAdapter {
 			holder.rgState2.setVisibility(View.GONE);
 			holder.llScore2.setVisibility(View.VISIBLE);
 			if (mActivity.getType() == TargetListActivity.TYPE_INSPECT_SUPERVISE
-					|| mActivity.getType() == TargetListActivity.TYPE_HISTORY) {
+					|| mActivity.getType() == TargetListActivity.TYPE_HISTORY
+					|| (mActivity.getType() == TargetListActivity.TYPE_TODAY
+							&& subcategory.getEdit_type().equals("0"))) {
 				holder.rbarScore2.setEnabled(false);
 			}
 			int score = 0;

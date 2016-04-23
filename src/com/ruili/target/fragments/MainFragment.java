@@ -11,6 +11,7 @@ import com.ruili.target.activitys.TargetListActivity;
 import com.ruili.target.adapters.MainFragmentAdapter;
 import com.ruili.target.entity.Category;
 import com.ruili.target.entity.CategoryListDTO;
+import com.ruili.target.entity.DecodeBarCodeDTO;
 import com.ruili.target.utils.Constant;
 import com.ruili.target.utils.DecodeJsonResponseUtils;
 import com.ruili.target.utils.Logger;
@@ -30,7 +31,15 @@ public class MainFragment extends ListFragment {
 	private static final String TAG = MainFragment.class.getSimpleName();
 	private int mOperatorID = -1;
 	private String mDate = null;
+	/**
+	 * 扫码返回的大类id
+	 */
+	private DecodeBarCodeDTO.IndexID mIndexID;
 
+	public void setScanIndexID(DecodeBarCodeDTO.IndexID indexID) {
+		mIndexID = indexID;
+	}
+	
 	public void setActivity(TargetListActivity activity) {
 		this.mActivity = activity;
 	}
@@ -92,6 +101,15 @@ public class MainFragment extends ListFragment {
 		List<Category> categories = (List<Category>) DecodeJsonResponseUtils.decode(response, TAG,
 				"decodeCategoryListResponse", mActivity.getToast(), mActivity, CategoryListDTO.class);
 		mAdapter.setCategories(categories);
+		if (mIndexID != null && categories != null) {
+			for (int i =0; i < categories.size(); i++) {
+				if (categories.get(i).getId() == mIndexID.getBig_index_id()) {
+					onListItemClick(null, null, i, -1);
+					mIndexID = null;
+					break;
+				}
+			}
+		}
 	}
 
 	private String getCategoryListUrl() {

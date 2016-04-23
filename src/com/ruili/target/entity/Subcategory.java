@@ -27,6 +27,10 @@ public class Subcategory {
 	private List<PicUrl> index_pic;
 	private String qc_state;
 	private String qc_describe;
+	/**
+	 * 用于今日指标中的标示是否可以编辑，1：可以编辑：2：不可编辑
+	 */
+	private String edit_type = "1";
 
 	public String getQc_state() {
 		return qc_state;
@@ -138,6 +142,15 @@ public class Subcategory {
 
 	public void setIndex_score(String index_score) {
 		this.index_score = index_score;
+	}
+
+
+	public String getEdit_type() {
+		return edit_type;
+	}
+
+	public void setEdit_type(String edit_type) {
+		this.edit_type = edit_type;
 	}
 
 	public int getStateResourceID() {

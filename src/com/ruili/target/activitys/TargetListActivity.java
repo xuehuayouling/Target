@@ -17,10 +17,11 @@ import com.google.zxing.client.android.CaptureActivity;
 import com.ruili.target.R;
 import com.ruili.target.entity.Category;
 import com.ruili.target.entity.CheckTime;
+import com.ruili.target.entity.DecodeBarCodeDTO;
+import com.ruili.target.entity.DecodeBarCodeDTO.IndexID;
 import com.ruili.target.entity.Employee;
 import com.ruili.target.entity.EmployeeListDTO;
 import com.ruili.target.entity.ResponseDTO;
-import com.ruili.target.entity.SimpleResultDTO;
 import com.ruili.target.fragments.DetailFragment;
 import com.ruili.target.fragments.MainFragment;
 import com.ruili.target.utils.Constant;
@@ -435,8 +436,10 @@ public class TargetListActivity extends BaseActivity implements OnClickListener 
 						mProgressDialogUtils.cancel();
 						Log.d(TAG, "decodeBarcodeFromNetWork" + " --> " + response);
 						try {
-							ResponseDTO dto = JsonUtil.parseObject(response, SimpleResultDTO.class);
+							ResponseDTO dto = JsonUtil.parseObject(response, DecodeBarCodeDTO.class);
 							if (dto.isValid()) {
+								IndexID indexID = (IndexID) dto.getData();
+								mMainFragment.setScanIndexID(indexID);
 								updateMainFragment();
 							} else {
 								getToast().show(getString(R.string.barcode_invalid));
