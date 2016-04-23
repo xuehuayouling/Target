@@ -105,10 +105,10 @@ public class MainFragment extends ListFragment {
 			for (int i =0; i < categories.size(); i++) {
 				if (categories.get(i).getId() == mIndexID.getBig_index_id()) {
 					onListItemClick(null, null, i, -1);
-					mIndexID = null;
 					break;
 				}
 			}
+			mIndexID = null;
 		}
 	}
 
