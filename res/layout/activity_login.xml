@@ -27,7 +27,7 @@
             android:background="@drawable/selector_et"
             android:layout_width="@dimen/login_widget_width"
             android:layout_height="@dimen/login_widget_height"
-            android:layout_marginBottom="25.6dp"
+            android:layout_marginBottom="12.8dp"
             android:singleLine="true"
             android:gravity="center"
             android:hint="@string/please_input_password"
@@ -36,7 +36,7 @@
             android:id="@+id/btn_login"
             android:background="@drawable/selector_btn"
             android:layout_width="@dimen/login_widget_width"
-            android:layout_height="@dimen/login_widget_height"
+            android:layout_height="@dimen/login_button_height"
             android:text="@string/action_login"/>
     </LinearLayout>
 

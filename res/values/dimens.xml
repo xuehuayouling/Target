@@ -5,7 +5,8 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="login_widget_width">384dp</dimen>
     <dimen name="login_widget_height">38.4dp</dimen>
-    <dimen name="login_button_margin_bottom">176.64dp</dimen>
+    <dimen name="login_button_height">48.4dp</dimen>
+    <dimen name="login_button_margin_bottom">166.64dp</dimen>
     <dimen name="main_buttons_margin_bottom">54.66dp</dimen>
     <dimen name="main_buttons_width">102.4dp</dimen>
     <dimen name="main_buttons_height">102.4dp</dimen>
@@ -27,6 +28,6 @@
     <dimen name="standard_padding">8dip</dimen>
     <dimen name="half_padding">4dip</dimen>
     <dimen name="popup_menu_width">128dp</dimen>
-    <dimen name="change_password_button_margin_bottom">136.64dp</dimen>
+    <dimen name="change_password_button_margin_bottom">146.64dp</dimen>
 
 </resources>
