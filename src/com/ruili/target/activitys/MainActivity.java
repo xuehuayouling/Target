@@ -34,7 +34,9 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 	}
 
 	private void showLoginActivity() {
-		startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+		Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+		startActivity(intent);
 		finish();
 	}
 
