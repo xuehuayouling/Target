@@ -91,7 +91,10 @@ public class DetailsFragmentAdapter extends BaseAdapter {
 
 			@Override
 			public void onClick(View v) {
-				onListItemClick(subcategory);
+				if (mActivity.getType() == TargetListActivity.TYPE_TODAY && subcategory.getEdit_type().equals("0")) {
+				} else {
+					onListItemClick(subcategory);
+				}
 			}
 		});
 		ViewHolder holder = (ViewHolder) view.getTag();
@@ -187,7 +190,10 @@ public class DetailsFragmentAdapter extends BaseAdapter {
 
 			@Override
 			public void onClick(View v) {
-				onListItemClick(subcategory);
+				if (mActivity.getType() == TargetListActivity.TYPE_TODAY && subcategory.getEdit_type().equals("0")) {
+				} else {
+					onListItemClick(subcategory);
+				}
 			}
 		});
 		holder.viewState2.setBackgroundResource(subcategory.getStateResourceID());
