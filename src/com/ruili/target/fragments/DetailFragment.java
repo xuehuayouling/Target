@@ -46,15 +46,6 @@ public class DetailFragment extends ListFragment {
 	}
 
 	@Override
-	public void onListItemClick(ListView l, View v, int position, long id) {
-		Intent intent = new Intent(getActivity(), TargetDetailsActivity.class);
-		final Subcategory subcategory = (Subcategory) mAdapter.getItem(position);
-		intent.putExtra(TargetDetailsActivity.KEY_SUBCATEGORY, subcategory.getIndex_log_id());
-		intent.putExtra(TargetDetailsActivity.KEY_TYPE, mActivity.getType());
-		startActivity(intent);
-	}
-
-	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		mAdapter = new DetailsFragmentAdapter((TargetListActivity) getActivity(), null);

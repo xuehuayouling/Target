@@ -4,68 +4,177 @@
     android:layout_width="match_parent"
     android:layout_height="@dimen/details_list_item_height"
     android:baselineAligned="false"
-    android:descendantFocusability="blocksDescendants"
     android:gravity="center_vertical" >
 
-    <include
+    <LinearLayout
+        android:id="@+id/ll_details_list_item"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        layout="@layout/widget_details_common_info" />
+        android:background="@android:drawable/list_selector_background"
+        android:baselineAligned="false"
+        android:clickable="true"
+        android:descendantFocusability="blocksDescendants"
+        android:orientation="horizontal" >
+
+        <include
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            layout="@layout/widget_details_common_info" />
+
+        <LinearLayout
+            android:id="@+id/ll_widget_frame"
+            android:layout_width="210dp"
+            android:layout_height="match_parent"
+            android:orientation="horizontal" >
+
+            <LinearLayout
+                android:id="@+id/ll_score"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:visibility="gone"
+                tools:ignore="NestedWeights" >
+
+                <RatingBar
+                    android:id="@+id/rbar_score"
+                    style="?android:attr/ratingBarStyleIndicator"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:rating="0"
+                    android:stepSize="1.0" />
+            </LinearLayout>
+
+            <RadioGroup
+                android:id="@+id/rg_state"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="horizontal"
+                tools:ignore="NestedWeights" >
+
+                <RadioButton
+                    android:id="@+id/rbtn_yes"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:paddingEnd="5dp"
+                    android:paddingStart="5dp"
+                    android:text="@string/good" />
+
+                <RadioButton
+                    android:id="@+id/rbtn_no"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:checked="true"
+                    android:paddingEnd="5dp"
+                    android:paddingStart="5dp"
+                    android:text="@string/bad" />
+            </RadioGroup>
+
+            <include layout="@layout/widget_arrow_right" />
+        </LinearLayout>
+    </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/ll_widget_frame"
+        android:id="@+id/ll_details_list_item2"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
+        android:background="@android:drawable/list_selector_background"
+        android:baselineAligned="false"
+        android:clickable="true"
+        android:descendantFocusability="blocksDescendants"
         android:orientation="horizontal" >
 
         <LinearLayout
-            android:id="@+id/ll_score"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:gravity="center"
-            android:visibility="gone"
-            tools:ignore="NestedWeights" >
+            android:baselineAligned="false"
+            android:gravity="center_vertical" >
 
-            <RatingBar
-                android:id="@+id/rbar_score"
-                android:layout_width="wrap_content"
+            <View
+                android:id="@+id/view_state2"
+                android:layout_width="@dimen/details_list_item_indicator_width"
+                android:layout_height="match_parent"
+                android:background="@color/blue" />
+
+            <RelativeLayout
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:rating="0"
-                android:stepSize="1.0" />
+                android:layout_weight="1"
+                android:paddingBottom="6dip"
+                android:paddingEnd="@dimen/preference_item_padding_inner"
+                android:paddingStart="6dp"
+                android:paddingTop="6dip" >
+
+                <TextView
+                    android:id="@+id/tv_title2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="marquee"
+                    android:fadingEdge="horizontal"
+                    android:maxLines="2"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+            </RelativeLayout>
         </LinearLayout>
-        
-        <RadioGroup
-            android:id="@+id/rg_state"
-            android:layout_width="0dp"
+
+        <LinearLayout
+            android:id="@+id/ll_widget_frame2"
+            android:layout_width="210dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="horizontal"
-            tools:ignore="NestedWeights" >
+            android:orientation="horizontal" >
 
-            <RadioButton
-                android:id="@+id/rbtn_yes"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:id="@+id/ll_score2"
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_marginEnd="50dp"
-                android:paddingEnd="10dp"
-                android:paddingStart="10dp"
-                android:text="@string/good" />
+                android:layout_weight="1"
+                android:gravity="center"
+                android:visibility="gone"
+                tools:ignore="NestedWeights" >
 
-            <RadioButton
-                android:id="@+id/rbtn_no"
-                android:layout_width="wrap_content"
+                <RatingBar
+                    android:id="@+id/rbar_score2"
+                    style="?android:attr/ratingBarStyleIndicator"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:rating="0"
+                    android:stepSize="1.0" />
+            </LinearLayout>
+
+            <RadioGroup
+                android:id="@+id/rg_state2"
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:checked="true"
-                android:paddingEnd="10dp"
-                android:paddingStart="10dp"
-                android:text="@string/bad" />
-        </RadioGroup>
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="horizontal"
+                tools:ignore="NestedWeights" >
 
-        <include layout="@layout/widget_arrow_right" />
+                <RadioButton
+                    android:id="@+id/rbtn_yes2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:paddingEnd="5dp"
+                    android:paddingStart="5dp"
+                    android:text="@string/good" />
+
+                <RadioButton
+                    android:id="@+id/rbtn_no2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:checked="true"
+                    android:paddingEnd="5dp"
+                    android:paddingStart="5dp"
+                    android:text="@string/bad" />
+            </RadioGroup>
+
+            <include layout="@layout/widget_arrow_right" />
+        </LinearLayout>
     </LinearLayout>
 
 </LinearLayout>

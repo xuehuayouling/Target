@@ -121,7 +121,7 @@
         <fragment
             android:id="@+id/fragment_main"
             android:name="com.ruili.target.fragments.MainFragment"
-            android:layout_width="384dp"
+            android:layout_width="230dp"
             android:layout_height="match_parent" />
 
         <View
