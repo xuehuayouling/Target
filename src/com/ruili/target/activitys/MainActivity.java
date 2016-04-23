@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.PopupWindow;
 import android.widget.TextView;
@@ -118,7 +119,8 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 
 	private void initSettingsMenu() {
 		View view = LayoutInflater.from(this).inflate(R.layout.widget_quit, null);
-		view.setOnClickListener(new OnClickListener() {
+		Button btnQuit = (Button) view.findViewById(R.id.btn_quit);
+		btnQuit.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View arg0) {
@@ -127,10 +129,23 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 				showLoginActivity();
 			}
 		});
+		Button btnChangePassword = (Button) view.findViewById(R.id.btn_change_password);
+		btnChangePassword.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View arg0) {
+				dismissSettingsMenu();
+				showChangePasswordActivity();
+			}
+		});
 		mPopupWindow = new PopupWindow(view, LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
 		mPopupWindow.setBackgroundDrawable(new BitmapDrawable());
 		mPopupWindow.setFocusable(true);
 		mPopupWindow.setOutsideTouchable(true);
 		mPopupWindow.update();
+	}
+
+	protected void showChangePasswordActivity() {
+		startActivity(new Intent(getApplicationContext(), ChangePasswordActivity.class));
 	}
 }

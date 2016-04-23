@@ -11,8 +11,8 @@
     <dimen name="main_buttons_height">102.4dp</dimen>
     <dimen name="main_buttons_distance">140.7dp</dimen>
     <dimen name="main_button_text_distance">14.72dp</dimen>
-    <dimen name="main_settings_button_width">37.5dp</dimen>
-    <dimen name="main_settings_button_height">37.5dp</dimen>
+    <dimen name="main_settings_button_width">47.5dp</dimen>
+    <dimen name="main_settings_button_height">47.5dp</dimen>
     <dimen name="preference_item_padding_side">8dp</dimen>
     <dimen name="preference_icon_minWidth">0dp</dimen>
     <dimen name="preference_item_padding_inner">8dp</dimen>
@@ -27,5 +27,6 @@
     <dimen name="standard_padding">8dip</dimen>
     <dimen name="half_padding">4dip</dimen>
     <dimen name="popup_menu_width">128dp</dimen>
+    <dimen name="change_password_button_margin_bottom">136.64dp</dimen>
 
 </resources>

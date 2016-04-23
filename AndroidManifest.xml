@@ -103,6 +103,10 @@
             android:screenOrientation="landscape" >
         </activity>
         <activity
+            android:name="com.ruili.target.activitys.ChangePasswordActivity"
+            android:screenOrientation="landscape" >
+        </activity>
+        <activity
             android:name="com.ruili.target.activitys.BaseActivity"
             android:screenOrientation="landscape" >
         </activity>

@@ -14,6 +14,7 @@
     <string name="please_wait">请稍后…</string>
     <string name="logining">登录中…</string>
     <string name="quit_login">退出登录</string>
+    <string name="change_password">修改密码</string>
     <string name="scan">扫描</string>
     <string name="example_date">2016–03–03</string>
     <string name="please_choice_employee">请选择员工</string>
@@ -36,6 +37,11 @@
     <string name="barcode_invalid">无效二维码</string>
     <string name="good">正常</string>
     <string name="bad">不正常</string>
+    <string name="please_input_user_name">请输入用户名</string>
+    <string name="please_input_password">请输入密码</string>
+    <string name="please_input_old_password">请输入旧密码</string>
+    <string name="please_input_new_password">请输入新密码</string>
+    <string name="please_input_new_password_repeat">请再输入一次新密码</string>
     
     <string name="app_picker_name">Applications</string>
     <string name="bookmark_picker_name">Bookmarks</string>
