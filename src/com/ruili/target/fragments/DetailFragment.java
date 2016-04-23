@@ -32,6 +32,7 @@ public class DetailFragment extends ListFragment {
 	private int mCategoryId = -1;
 	private int mCheckTimeId = CheckTime.CHECK_TIME_NULL;
 	private String mDate;
+	private String mChecked = null;
 
 	public void setActivity(TargetListActivity activity) {
 		this.mActivity = activity;
@@ -49,6 +50,11 @@ public class DetailFragment extends ListFragment {
 		this.setListAdapter(mAdapter);
 	}
 
+	public void updateSubcategoryList(int categoryId, int checktimeID, String date, String checked) {
+		mChecked = checked;
+		updateSubcategoryList(categoryId, checktimeID, date);
+	}
+	
 	public void updateSubcategoryList(int categoryId, int checktimeID, String date) {
 		mCategoryId = categoryId;
 		mCheckTimeId = checktimeID;
@@ -56,6 +62,11 @@ public class DetailFragment extends ListFragment {
 		loadSubcategoryList();
 	}
 
+	public void setChecked(String checked) {
+		mChecked = checked;
+		loadSubcategoryList();
+	}
+	
 	public void setCheckTimeID(int checkTimeID) {
 		mCheckTimeId = checkTimeID;
 		loadSubcategoryList();
@@ -117,6 +128,8 @@ public class DetailFragment extends ListFragment {
 		int operatoryId = mActivity.getUserOperatorID();
 		if (mActivity.getType() == TargetListActivity.TYPE_INSPECT_SUPERVISE) {
 			operatoryId = mActivity.getOperatorId();
+		} else {
+			mChecked = null;
 		}
 		String date = mDate;
 		if (mActivity.getType() == TargetListActivity.TYPE_TODAY) {
@@ -128,7 +141,7 @@ public class DetailFragment extends ListFragment {
 			}
 		}
 		String url = Constant.BASE_URL
-				+ String.format("/api/v1/index/%d/%d/%s/%s/small_indexs", mCategoryId, operatoryId, checktime, date);
+				+ String.format("/api/v1/index/%d/%d/%s/%s/%s/small_indexs", mCategoryId, operatoryId, checktime, date, mChecked);
 		Logger.debug(TAG, "getSubCategoryUrl -->  " + url);
 		return url;
 	}

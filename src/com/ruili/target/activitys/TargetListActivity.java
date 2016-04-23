@@ -67,6 +67,7 @@ public class TargetListActivity extends BaseActivity implements OnClickListener 
 	private TextView mTVDate;
 	private TextView mTVTime;
 	private TextView mTVEmployee;
+	private CheckBox mCbScan;
 	public static final int OPETATOR_ID_INVALID = -1;
 	private int mOperatorID = OPETATOR_ID_INVALID;
 	private PopupWindow mTimeMenus;
@@ -110,18 +111,18 @@ public class TargetListActivity extends BaseActivity implements OnClickListener 
 	}
 	
 	private void initCheckBoxUnchecked() {
-		CheckBox tvScan = (CheckBox) findViewById(R.id.ctv_unchecked);
-		tvScan.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+		mCbScan = (CheckBox) findViewById(R.id.ctv_unchecked);
+		mCbScan.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 			
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				
+				mDetailFragment.setChecked(mCbScan.isChecked() ? "2" : null);
 			}
 		});
 		if (mType == TYPE_INSPECT_SUPERVISE) {
-			tvScan.setVisibility(View.VISIBLE);
+			mCbScan.setVisibility(View.VISIBLE);
 		} else {
-			tvScan.setVisibility(View.GONE);
+			mCbScan.setVisibility(View.GONE);
 		}
 	}
 
@@ -200,7 +201,7 @@ public class TargetListActivity extends BaseActivity implements OnClickListener 
 	}
 
 	private void updateDetailsList(int categoryId, int checktimeID, String date) {
-		mDetailFragment.updateSubcategoryList(categoryId, checktimeID, date);
+		mDetailFragment.updateSubcategoryList(categoryId, checktimeID, date, mCbScan.isChecked() ? "2" : null);
 	}
 
 	@Override
