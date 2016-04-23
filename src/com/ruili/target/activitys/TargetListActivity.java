@@ -42,6 +42,8 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -93,6 +95,7 @@ public class TargetListActivity extends BaseActivity implements OnClickListener 
 		initTextViewEmployee();
 		initTextViewTime();
 		initTextViewScan();
+		initCheckBoxUnchecked();
 		initImageViewMenu();
 	}
 
@@ -100,6 +103,22 @@ public class TargetListActivity extends BaseActivity implements OnClickListener 
 		TextView tvScan = (TextView) findViewById(R.id.tv_scan);
 		tvScan.setOnClickListener(this);
 		if (mType == TYPE_TODAY) {
+			tvScan.setVisibility(View.VISIBLE);
+		} else {
+			tvScan.setVisibility(View.GONE);
+		}
+	}
+	
+	private void initCheckBoxUnchecked() {
+		CheckBox tvScan = (CheckBox) findViewById(R.id.ctv_unchecked);
+		tvScan.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+			
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				
+			}
+		});
+		if (mType == TYPE_INSPECT_SUPERVISE) {
 			tvScan.setVisibility(View.VISIBLE);
 		} else {
 			tvScan.setVisibility(View.GONE);

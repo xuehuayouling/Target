@@ -9,7 +9,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.ruili.target.R;
-import com.ruili.target.activitys.TargetDetailsActivity;
 import com.ruili.target.activitys.TargetListActivity;
 import com.ruili.target.adapters.DetailsFragmentAdapter;
 import com.ruili.target.entity.CheckTime;
@@ -21,12 +20,10 @@ import com.ruili.target.utils.DecodeJsonResponseUtils;
 import com.ruili.target.utils.Logger;
 
 import android.app.ListFragment;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
 
 public class DetailFragment extends ListFragment {
 	private TargetListActivity mActivity;
