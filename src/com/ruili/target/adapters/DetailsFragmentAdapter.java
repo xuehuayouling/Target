@@ -110,6 +110,9 @@ public class DetailsFragmentAdapter extends BaseAdapter {
 							&& subcategory.getEdit_type().equals("0"))) {
 				holder.rgState.findViewById(R.id.rbtn_yes).setEnabled(false);
 				holder.rgState.findViewById(R.id.rbtn_no).setEnabled(false);
+			} else {
+				holder.rgState.findViewById(R.id.rbtn_yes).setEnabled(true);
+				holder.rgState.findViewById(R.id.rbtn_no).setEnabled(true);
 			}
 			if (subcategory.getIndex_complete() == Subcategory.INDEX_COMPLETE_YES) {
 				holder.rgState.check(R.id.rbtn_yes);
@@ -149,6 +152,8 @@ public class DetailsFragmentAdapter extends BaseAdapter {
 					|| (mActivity.getType() == TargetListActivity.TYPE_TODAY
 							&& subcategory.getEdit_type().equals("0"))) {
 				holder.rbarScore.setEnabled(false);
+			} else {
+				holder.rbarScore.setEnabled(true);
 			}
 			int score = 0;
 			try {
@@ -208,6 +213,9 @@ public class DetailsFragmentAdapter extends BaseAdapter {
 							&& subcategory.getEdit_type().equals("0"))) {
 				holder.rgState2.findViewById(R.id.rbtn_yes2).setEnabled(false);
 				holder.rgState2.findViewById(R.id.rbtn_no2).setEnabled(false);
+			} else {
+				holder.rgState2.findViewById(R.id.rbtn_yes2).setEnabled(true);
+				holder.rgState2.findViewById(R.id.rbtn_no2).setEnabled(true);
 			}
 			if (subcategory.getIndex_complete() == Subcategory.INDEX_COMPLETE_YES) {
 				holder.rgState2.check(R.id.rbtn_yes2);
@@ -247,6 +255,8 @@ public class DetailsFragmentAdapter extends BaseAdapter {
 					|| (mActivity.getType() == TargetListActivity.TYPE_TODAY
 							&& subcategory.getEdit_type().equals("0"))) {
 				holder.rbarScore2.setEnabled(false);
+			} else {
+				holder.rbarScore2.setEnabled(true);
 			}
 			int score = 0;
 			try {
