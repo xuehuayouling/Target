@@ -2,6 +2,8 @@ package com.ruili.target.activitys;
 
 import com.baidu.android.pushservice.PushConstants;
 import com.baidu.android.pushservice.PushManager;
+import com.iflytek.cloud.SpeechConstant;
+import com.iflytek.cloud.SpeechUtility;
 import com.ruili.target.R;
 import com.ruili.target.entity.User;
 import com.ruili.target.utils.MetaDataUtil;
@@ -34,8 +36,11 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 		}
 		setContentView(R.layout.activity_main);
 		initViews();
+		// 百度云推送
 		PushManager.startWork(getApplicationContext(), PushConstants.LOGIN_TYPE_API_KEY,
                 MetaDataUtil.getMetaValue(MainActivity.this, "api_key"));
+		// 讯飞语音合成
+		SpeechUtility.createUtility(getApplicationContext(), SpeechConstant.APPID +"=571d6c4c," + SpeechConstant.FORCE_LOGIN +"=true");   
 	}
 
 	private void showLoginActivity() {

@@ -46,7 +46,7 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		PushManager.stopWork(LoginActivity.this);
+		PushManager.stopWork(getApplicationContext());
 	}
 	private void initViews() {
 		mETUserName = (EditText) findViewById(R.id.et_login_user_name);
