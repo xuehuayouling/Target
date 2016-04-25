@@ -1,7 +1,10 @@
 package com.ruili.target.activitys;
 
+import com.baidu.android.pushservice.PushConstants;
+import com.baidu.android.pushservice.PushManager;
 import com.ruili.target.R;
 import com.ruili.target.entity.User;
+import com.ruili.target.utils.MetaDataUtil;
 import com.umeng.update.UmengUpdateAgent;
 
 import android.app.Activity;
@@ -31,6 +34,8 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 		}
 		setContentView(R.layout.activity_main);
 		initViews();
+		PushManager.startWork(getApplicationContext(), PushConstants.LOGIN_TYPE_API_KEY,
+                MetaDataUtil.getMetaValue(MainActivity.this, "api_key"));
 	}
 
 	private void showLoginActivity() {

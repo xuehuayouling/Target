@@ -10,6 +10,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.baidu.android.pushservice.PushManager;
 import com.ruili.target.R;
 import com.ruili.target.entity.User;
 import com.ruili.target.entity.UserDTO;
@@ -42,6 +43,11 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 		initRequestQueue();
 	}
 
+	@Override
+	protected void onResume() {
+		super.onResume();
+		PushManager.stopWork(LoginActivity.this);
+	}
 	private void initViews() {
 		mETUserName = (EditText) findViewById(R.id.et_login_user_name);
 		mETPassword = (EditText) findViewById(R.id.et_login_password);
