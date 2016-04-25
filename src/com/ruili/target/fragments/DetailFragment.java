@@ -64,7 +64,9 @@ public class DetailFragment extends ListFragment {
 
 	public void setChecked(String checked) {
 		mChecked = checked;
-		loadSubcategoryList();
+		if (mAdapter.getCount() > 0) {
+			loadSubcategoryList();
+		}
 	}
 	
 	public void setCheckTimeID(int checkTimeID) {
@@ -134,11 +136,11 @@ public class DetailFragment extends ListFragment {
 		String date = mDate;
 		if (mActivity.getType() == TargetListActivity.TYPE_TODAY) {
 			date = null;
-		} else if (mActivity.getType() == TargetListActivity.TYPE_INSPECT_SUPERVISE) {
-			Calendar c = Calendar.getInstance();
-			if (mDate.equals(DateUtils.getDateString(new Date(c.getTimeInMillis())))) {
-				date = null;
-			}
+//		} else if (mActivity.getType() == TargetListActivity.TYPE_INSPECT_SUPERVISE) {
+//			Calendar c = Calendar.getInstance();
+//			if (mDate.equals(DateUtils.getDateString(new Date(c.getTimeInMillis())))) {
+//				date = null;
+//			}
 		}
 		String url = Constant.BASE_URL
 				+ String.format("/api/v1/index/%d/%d/%s/%s/%s/small_indexs", mCategoryId, operatoryId, checktime, date, mChecked);
